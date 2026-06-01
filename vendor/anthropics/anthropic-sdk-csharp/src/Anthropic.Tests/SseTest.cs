@@ -1,0 +1,222 @@
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using Anthropic.Core;
+using Anthropic.Exceptions;
+using Anthropic.Models;
+
+namespace Anthropic.Tests;
+
+public class SseTest : TestBase
+{
+    static readonly TheoryData<string, string[]> _data = new()
+    {
+        // event and data
+        { "event: completion\n" + "data: {\"foo\":true}\n\n", new[] { "{\"foo\": true}" } },
+        // event missing data
+        { "event: completion\n" + "\n", [] },
+        // multiple events and data
+        {
+            "event: completion\n"
+                + "data: {\"foo\":true}\n\n"
+                + "event: message_start\n"
+                + "data: {\"bar\": false}\n\n",
+            new[] { "{\"foo\": true}", "{\"bar\": false}" }
+        },
+        // multiple events missing data
+        { "event: completion\n" + "\n" + "event: message_start\n" + "\n", [] },
+        // json-escaped double newline
+        {
+            "event: completion\n" + "data: {\ndata: \"foo\":\ndata: true }\n\n\n",
+            new[] { "{ \"foo\":\ntrue }" }
+        },
+        // multiple data lines
+        {
+            "event: completion\n" + "data: { \ndata: \"foo\":\ndata: true }\n\n\n",
+            new[] { "{ \"foo\":\ntrue }" }
+        },
+        // special newline character
+        {
+            "event: completion\n"
+                + "data: {\"content\": \" culpa\"}\n\n"
+                + "event: message_start\n"
+                + "data: {\"content\": \" \u2028\"}\n\n"
+                + "event: completion\n"
+                + "data: {\"content\": \"foo\"}\n\n",
+            new[]
+            {
+                "{\"content\": \" culpa\"}",
+                "{\"content\": \" \u2028\"}",
+                "{\"content\": \"foo\"}",
+            }
+        },
+        // multi-byte character
+        {
+            "event: completion\n"
+                + "data: {\"content\": "
+                + "\"\u0438\u0437\u0432\u0435\u0441\u0442\u043d\u0438\"}\n\n}",
+            new[] { "{\"content\":\"известни\"}" }
+        },
+    };
+
+    public static TheoryData<string, string[]> Data
+    {
+        get { return _data; }
+    }
+
+    [Theory]
+    [MemberData(nameof(Data))]
+    public async Task Sse_Works(
+        string events,
+        string[] expectedMessageStrings,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var expectedMessages = new List<JsonElement>();
+        foreach (var message in expectedMessageStrings)
+        {
+            expectedMessages.Add(JsonSerializer.Deserialize<JsonElement>(message));
+        }
+
+        var resp = new HttpResponseMessage() { Content = new StringContent(events) };
+
+        var actualMessages = new List<JsonElement>();
+        await foreach (var message in Sse.Enumerate<JsonElement>(resp, cancellationToken))
+        {
+            actualMessages.Add(message);
+        }
+
+        Assert.Equal(expectedMessages.Count, actualMessages.Count);
+        for (int i = 0; i < expectedMessages.Count; i++)
+        {
+            Assert.True(JsonElement.DeepEquals(expectedMessages[i], actualMessages[i]));
+        }
+    }
+
+    [Fact]
+    public async Task SseEventError_Works()
+    {
+        var resp = new HttpResponseMessage()
+        {
+            Content = new StringContent("event: error\ndata: unspecified error\n\n"),
+        };
+
+        var exception = await Assert.ThrowsAsync<AnthropicSseException>(async () =>
+        {
+            await foreach (
+                var message in Sse.Enumerate<JsonElement>(
+                    resp,
+                    TestContext.Current.CancellationToken
+                )
+            ) { }
+        });
+
+        Assert.Equal("SSE error returned from server: 'unspecified error'", exception.Message);
+    }
+
+    [Fact]
+    public void CreateApiException_ExtractsErrorType()
+    {
+        var body =
+            """{"type":"error","error":{"type":"invalid_request_error","message":"Bad request"}}""";
+        var ex = AnthropicExceptionFactory.CreateApiException(HttpStatusCode.BadRequest, body);
+
+        Assert.IsType<AnthropicBadRequestException>(ex);
+        Assert.Equal(ErrorType.InvalidRequestError, ex.ErrorType);
+    }
+
+    [Fact]
+    public void CreateApiException_NullErrorType_WhenMissing()
+    {
+        var body = """{"message":"something went wrong"}""";
+        var ex = AnthropicExceptionFactory.CreateApiException(HttpStatusCode.BadRequest, body);
+
+        Assert.Null(ex.ErrorType);
+    }
+
+    [Fact]
+    public void CreateApiException_NullErrorType_WhenNotJson()
+    {
+        var ex = AnthropicExceptionFactory.CreateApiException(
+            HttpStatusCode.BadGateway,
+            "Bad Gateway"
+        );
+
+        Assert.Null(ex.ErrorType);
+    }
+
+    [Fact]
+    public void ExtractErrorType_NullForUnknownType()
+    {
+        var body = """{"type":"error","error":{"type":"some_future_error","message":"Unknown"}}""";
+        var result = AnthropicExceptionFactory.ExtractErrorType(body);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task StreamingError_SseException_WithErrorType()
+    {
+        var sseData =
+            """{"type":"error","error":{"type":"overloaded_error","message":"Overloaded"}}""";
+        var resp = new HttpResponseMessage()
+        {
+            Content = new StringContent($"event: error\ndata: {sseData}\n\n"),
+        };
+
+        var exception = await Assert.ThrowsAsync<AnthropicSseException>(async () =>
+        {
+            await foreach (
+                var message in Sse.Enumerate<JsonElement>(
+                    resp,
+                    TestContext.Current.CancellationToken
+                )
+            ) { }
+        });
+
+        Assert.Equal(ErrorType.OverloadedError, exception.ErrorType);
+    }
+
+    [Fact]
+    public async Task StreamingError_NonJsonData_NullErrorType()
+    {
+        var resp = new HttpResponseMessage()
+        {
+            Content = new StringContent("event: error\ndata: ThrottlingException\n\n"),
+        };
+
+        var exception = await Assert.ThrowsAsync<AnthropicSseException>(async () =>
+        {
+            await foreach (
+                var message in Sse.Enumerate<JsonElement>(
+                    resp,
+                    TestContext.Current.CancellationToken
+                )
+            ) { }
+        });
+
+        Assert.Null(exception.ErrorType);
+    }
+
+    [Fact]
+    public void ServiceException_CatchesBothHttpAndSseErrors()
+    {
+        // HTTP error is catchable as AnthropicServiceException
+        var body =
+            """{"type":"error","error":{"type":"rate_limit_error","message":"Rate limited"}}""";
+        var httpEx = AnthropicExceptionFactory.CreateApiException((HttpStatusCode)429, body);
+        Assert.IsType<AnthropicServiceException>(httpEx, exactMatch: false);
+        Assert.Equal(ErrorType.RateLimitError, httpEx.ErrorType);
+
+        // SSE error is catchable as AnthropicServiceException
+        var sseEx = new AnthropicSseException("SSE error")
+        {
+            ErrorType = ErrorType.OverloadedError,
+        };
+        Assert.IsType<AnthropicServiceException>(sseEx, exactMatch: false);
+        Assert.Equal(ErrorType.OverloadedError, sseEx.ErrorType);
+    }
+}

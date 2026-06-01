@@ -1,0 +1,113 @@
+using System.Text.Json;
+using Anthropic.Core;
+using Anthropic.Models.Beta.Messages;
+
+namespace Anthropic.Tests.Models.Beta.Messages;
+
+public class BetaCitationsWebSearchResultLocationTest : TestBase
+{
+    [Fact]
+    public void FieldRoundtrip_Works()
+    {
+        var model = new BetaCitationsWebSearchResultLocation
+        {
+            CitedText = "cited_text",
+            EncryptedIndex = "encrypted_index",
+            Title = "title",
+            Url = "url",
+        };
+
+        string expectedCitedText = "cited_text";
+        string expectedEncryptedIndex = "encrypted_index";
+        string expectedTitle = "title";
+        JsonElement expectedType = JsonSerializer.SerializeToElement("web_search_result_location");
+        string expectedUrl = "url";
+
+        Assert.Equal(expectedCitedText, model.CitedText);
+        Assert.Equal(expectedEncryptedIndex, model.EncryptedIndex);
+        Assert.Equal(expectedTitle, model.Title);
+        Assert.True(JsonElement.DeepEquals(expectedType, model.Type));
+        Assert.Equal(expectedUrl, model.Url);
+    }
+
+    [Fact]
+    public void SerializationRoundtrip_Works()
+    {
+        var model = new BetaCitationsWebSearchResultLocation
+        {
+            CitedText = "cited_text",
+            EncryptedIndex = "encrypted_index",
+            Title = "title",
+            Url = "url",
+        };
+
+        string json = JsonSerializer.Serialize(model, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<BetaCitationsWebSearchResultLocation>(
+            json,
+            ModelBase.SerializerOptions
+        );
+
+        Assert.Equal(model, deserialized);
+    }
+
+    [Fact]
+    public void FieldRoundtripThroughSerialization_Works()
+    {
+        var model = new BetaCitationsWebSearchResultLocation
+        {
+            CitedText = "cited_text",
+            EncryptedIndex = "encrypted_index",
+            Title = "title",
+            Url = "url",
+        };
+
+        string element = JsonSerializer.Serialize(model, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<BetaCitationsWebSearchResultLocation>(
+            element,
+            ModelBase.SerializerOptions
+        );
+        Assert.NotNull(deserialized);
+
+        string expectedCitedText = "cited_text";
+        string expectedEncryptedIndex = "encrypted_index";
+        string expectedTitle = "title";
+        JsonElement expectedType = JsonSerializer.SerializeToElement("web_search_result_location");
+        string expectedUrl = "url";
+
+        Assert.Equal(expectedCitedText, deserialized.CitedText);
+        Assert.Equal(expectedEncryptedIndex, deserialized.EncryptedIndex);
+        Assert.Equal(expectedTitle, deserialized.Title);
+        Assert.True(JsonElement.DeepEquals(expectedType, deserialized.Type));
+        Assert.Equal(expectedUrl, deserialized.Url);
+    }
+
+    [Fact]
+    public void Validation_Works()
+    {
+        var model = new BetaCitationsWebSearchResultLocation
+        {
+            CitedText = "cited_text",
+            EncryptedIndex = "encrypted_index",
+            Title = "title",
+            Url = "url",
+        };
+
+        model.Validate();
+    }
+
+    [Fact]
+    public void CopyConstructor_Works()
+    {
+        var model = new BetaCitationsWebSearchResultLocation
+        {
+            CitedText = "cited_text",
+            EncryptedIndex = "encrypted_index",
+            Title = "title",
+            Url = "url",
+        };
+
+        BetaCitationsWebSearchResultLocation copied = new(model);
+
+        Assert.Equal(model, copied);
+    }
+}

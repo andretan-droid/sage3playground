@@ -1,0 +1,380 @@
+// Wrap generated code in the package module so intra-file type references
+// (e.g. `basic::Status`, `basic::Address`) resolve correctly.
+//
+// The clippy allows suppress lints that fire on generated code patterns:
+// - derivable_impls: generated enum Default impls are explicit rather than derived
+// - match_single_binding: empty messages generate a single-arm wildcard merge match
+#[allow(clippy::derivable_impls, clippy::match_single_binding)]
+pub mod basic {
+    buffa::include_proto!("basic");
+}
+
+/// `string_type(SmolStr)` + vtable reflection — exercises `ReflectElement for
+/// SmolStr` on the repeated-string element path.
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types
+)]
+pub mod vtable_string_repr {
+    buffa::include_proto!("vtable_string_repr");
+}
+
+/// `generate_views(false)` + vtable reflection — owned-only vtable, no views.
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types
+)]
+pub mod vtable_no_views {
+    buffa::include_proto!("vtable_no_views");
+}
+
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types
+)]
+pub mod proto3sem {
+    buffa::include_proto!("test.proto3sem");
+}
+
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types,
+    dead_code
+)]
+pub mod keywords {
+    buffa::include_proto!("test.keywords");
+}
+
+#[allow(clippy::derivable_impls, clippy::match_single_binding)]
+pub mod nested {
+    buffa::include_proto!("test.nested");
+}
+
+#[allow(clippy::derivable_impls, clippy::match_single_binding)]
+pub mod wkt {
+    buffa::include_proto!("test.wkt");
+}
+
+#[allow(clippy::derivable_impls, clippy::match_single_binding)]
+pub mod cross {
+    buffa::include_proto!("test.cross");
+}
+
+#[allow(clippy::derivable_impls, clippy::match_single_binding)]
+pub mod cross_syntax {
+    buffa::include_proto!("test.cross_syntax");
+}
+
+#[allow(clippy::derivable_impls, clippy::match_single_binding)]
+pub mod cross_pertype {
+    buffa::include_proto!("test.cross_pertype");
+}
+
+#[allow(clippy::derivable_impls, clippy::match_single_binding)]
+pub mod collisions {
+    buffa::include_proto!("test.collisions");
+}
+
+#[allow(clippy::derivable_impls, clippy::match_single_binding, dead_code)]
+pub mod prelude_shadow {
+    buffa::include_proto!("test.prelude_shadow");
+}
+
+// Nested-package pair, wrapped exactly the way `buffa-build`'s
+// `_include.rs` would. The chain of `use super::*;` glob imports makes the
+// outer package's `__buffa` reachable from `inner`'s scope, which is the
+// only consumer layout where a bare `pub use __buffa::…;` import path is
+// E0659-ambiguous against the locally-`include!`d `__buffa`. The natural
+// re-exports must use `self::__buffa::…` / `super::__buffa::…` to compile
+// here — see gh#80. Compilation is the assertion (`tests/nestpkg.rs` adds a
+// type-resolution sanity check).
+#[allow(clippy::derivable_impls, clippy::match_single_binding, dead_code)]
+pub mod nestpkg {
+    #[allow(unused_imports)]
+    use super::*;
+    buffa::include_proto!("test.nestpkg");
+    pub mod inner {
+        #[allow(unused_imports)]
+        use super::*;
+        buffa::include_proto!("test.nestpkg.inner");
+    }
+}
+
+// Issue #135: message-nesting module vs sub-package module collision. The
+// sub-package `modcollide.oof` is nested under `modcollide` as `pub mod oof`;
+// `message Oof`'s nested-types module is deconflicted to `oof_`, so the two no
+// longer redefine `mod oof`. Compiling this module is the regression guard.
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types,
+    dead_code
+)]
+pub mod modcollide {
+    buffa::include_proto!("modcollide");
+    pub mod oof {
+        buffa::include_proto!("modcollide.oof");
+    }
+}
+
+// Issue #135, multi-message race: `Oof`/`Oof_` nested modules deconflict to
+// `oof__`/`oof___` while sub-packages `oof`/`oof_` keep their names. Compiling
+// this nested layout proves the four modules coexist.
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types,
+    dead_code
+)]
+pub mod modrace {
+    buffa::include_proto!("modrace");
+    pub mod oof {
+        buffa::include_proto!("modrace.oof");
+    }
+    pub mod oof_ {
+        buffa::include_proto!("modrace.oof_");
+    }
+}
+
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types
+)]
+pub mod proto2 {
+    buffa::include_proto!("test.proto2");
+}
+
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types,
+    dead_code
+)]
+pub mod json_types {
+    buffa::include_proto!("test.json");
+}
+
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types,
+    dead_code
+)]
+pub mod view_json {
+    buffa::include_proto!("test.viewjson");
+}
+
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types,
+    dead_code
+)]
+pub mod view_json_p2 {
+    buffa::include_proto!("test.viewjson.p2");
+}
+
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types
+)]
+pub mod p2json {
+    buffa::include_proto!("test.p2json");
+}
+
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types
+)]
+pub mod utf8test {
+    buffa::include_proto!("utf8test");
+}
+
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    clippy::wildcard_in_or_patterns,
+    non_camel_case_types,
+    dead_code
+)]
+pub mod edenumjson {
+    buffa::include_proto!("test.edenumjson");
+}
+
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types,
+    dead_code
+)]
+pub mod edge {
+    buffa::include_proto!("test.edge");
+}
+
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types,
+    dead_code
+)]
+pub mod custopts {
+    buffa::include_proto!("buffa.test.options");
+}
+
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types,
+    dead_code
+)]
+pub mod extjson {
+    buffa::include_proto!("buffa.test.extjson");
+}
+
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types,
+    dead_code
+)]
+pub mod groupext {
+    buffa::include_proto!("buffa.test.groupext");
+}
+
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types,
+    dead_code
+)]
+pub mod msgset {
+    buffa::include_proto!("buffa.test.messageset");
+}
+
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types
+)]
+pub mod with_setters {
+    buffa::include_proto!("test.setters");
+}
+
+#[cfg(has_edition_2024)]
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types,
+    dead_code
+)]
+pub mod ed2024 {
+    buffa::include_proto!("test.ed2024");
+}
+
+// Regression: use_bytes_type() previously produced uncompilable decode code.
+// Compiling this module IS the test — if merge_bytes/decode_bytes mismatch
+// the bytes::Bytes field type, the build fails.
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types,
+    dead_code
+)]
+pub mod basic_bytes {
+    include!(concat!(env!("OUT_DIR"), "/bytes_variant/basic.mod.rs"));
+}
+
+// Carve-out (#76): utf8_validation.proto with a NONE-keyed `map<string, bytes>`,
+// compiled with strict_utf8_mapping() + use_bytes_type(). The effective
+// `map<bytes, bytes>` keeps `Vec<u8>` values; runtime checks live in
+// `tests/bytes_type.rs`.
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types,
+    dead_code
+)]
+pub mod utf8_bytes {
+    include!(concat!(
+        env!("OUT_DIR"),
+        "/utf8_bytes_variant/utf8test.mod.rs"
+    ));
+}
+
+// Regression #88: bytes_fields + generate_arbitrary(true). Compilation is the
+// primary assertion — all four bytes field shapes (singular, optional,
+// repeated, oneof variant) must compile with the arbitrary shims in place.
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types,
+    dead_code
+)]
+pub mod basic_arbitrary_bytes {
+    include!(concat!(env!("OUT_DIR"), "/arbitrary_bytes/basic.mod.rs"));
+}
+
+// Configurable string_type: SmolStr default + CompactString/EcoString
+// overrides, generate_json + arbitrary. Compiling this module exercises every
+// string code path against the real crates; runtime checks live in
+// `tests/string_type.rs`.
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types,
+    dead_code
+)]
+pub mod string_types {
+    include!(concat!(
+        env!("OUT_DIR"),
+        "/string_variant/stringtypes.mod.rs"
+    ));
+}
+
+// proto2 `[default = "..."]` + string_type. Compiling this verifies the
+// generated Default impl and clear() build the literal via the configured
+// repr's From<String>.
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types,
+    dead_code
+)]
+pub mod string_proto2 {
+    include!(concat!(
+        env!("OUT_DIR"),
+        "/string_proto2_variant/stringproto2.mod.rs"
+    ));
+}
+
+// Views + preserve_unknown_fields=false: covers the else-branches in view
+// codegen that omit the unknown-fields view field. Compilation IS the test.
+#[allow(
+    clippy::derivable_impls,
+    clippy::match_single_binding,
+    non_camel_case_types,
+    dead_code
+)]
+pub mod basic_no_uf {
+    include!(concat!(env!("OUT_DIR"), "/no_unknown_views/basic.mod.rs"));
+}
+
+// These tests intentionally use the field-assignment style
+// (`let mut m = T::default(); m.f = v;`) because it mirrors how protobuf
+// messages are constructed in other languages and is what the docs show.
+// `3.14` is a test value, not an attempt at PI.
+#[allow(
+    clippy::field_reassign_with_default,
+    clippy::approx_constant,
+    clippy::unnecessary_to_owned,
+    clippy::assertions_on_constants
+)]
+#[cfg(test)]
+mod tests;

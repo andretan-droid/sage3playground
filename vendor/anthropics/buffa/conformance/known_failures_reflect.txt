@@ -1,0 +1,3 @@
+# Known failures for the BUFFA_VIA_REFLECT mode.
+#
+# (Currently empty.)

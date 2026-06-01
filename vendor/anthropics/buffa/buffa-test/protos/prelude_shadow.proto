@@ -1,0 +1,66 @@
+// Regression for gh#36: a proto message named `Option` in a nested scope
+// shadows `core::option::Option` via the `use super::*` chain, breaking
+// generated optional/oneof field types and the JSON deserialize path.
+//
+// Covers top-level, 1-level nested, and 3-level nested `Option` messages,
+// each with an optional scalar and a oneof so the struct-field type, the
+// `skip_serializing_if` predicate, and the custom-deserialize temporaries
+// all emit `::core::option::Option<...>`.
+//
+// Built with views and JSON enabled — compilation alone is the assertion.
+
+syntax = "proto3";
+
+package test.prelude_shadow;
+
+// Top-level — exercises the JSON path (skip_serializing_if, deser temps).
+message Option {
+  optional string title = 1;
+  oneof value {
+    uint64 int_value = 2;
+    string str_value = 3;
+  }
+}
+
+// 1-level nested — the original gh#36 reproduction. `Option` is declared
+// inside `mod picker { use super::*; ... }`, shadowing the prelude there.
+message Picker {
+  message Option {
+    optional string title = 1;
+    oneof value {
+      uint64 int_value = 2;
+      string str_value = 3;
+    }
+  }
+  repeated Option options = 1;
+  optional string label = 2;
+}
+
+// Sibling propagation — `Option` and `Middle` are both nested in `Outer`,
+// so `mod outer` declares `struct Option` (shadowing the prelude there and
+// in `mod outer::middle` via `use super::*`). `Inner.x` must use the
+// fully-qualified path.
+message Outer {
+  message Option {
+    bool present = 1;
+  }
+  message Middle {
+    message Inner {
+      optional int32 x = 1;
+    }
+    optional Inner inner = 1;
+    optional string note = 2;
+  }
+  optional Middle middle = 1;
+}
+
+// Regression for the kind-tree collision: a `message View` produces a
+// nested-type module `pub mod view { ... }`. Under the sentinel design
+// the kind-tree view wrapper is `pub mod __buffa { pub mod view { ... } }`,
+// so this no longer collides. Compilation is the assertion.
+message View {
+  message Inner {
+    optional string s = 1;
+  }
+  optional Inner inner = 1;
+}

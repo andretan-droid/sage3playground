@@ -1,0 +1,124 @@
+using System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Anthropic.Exceptions;
+
+namespace Anthropic.Models.Beta;
+
+[JsonConverter(typeof(AnthropicBetaConverter))]
+public enum AnthropicBeta
+{
+    MessageBatches2024_09_24,
+    PromptCaching2024_07_31,
+    ComputerUse2024_10_22,
+    ComputerUse2025_01_24,
+    Pdfs2024_09_25,
+    TokenCounting2024_11_01,
+    TokenEfficientTools2025_02_19,
+    Output128k2025_02_19,
+    FilesApi2025_04_14,
+    McpClient2025_04_04,
+    McpClient2025_11_20,
+    DevFullThinking2025_05_14,
+    InterleavedThinking2025_05_14,
+    CodeExecution2025_05_22,
+    ExtendedCacheTtl2025_04_11,
+    Context1m2025_08_07,
+    ContextManagement2025_06_27,
+    ModelContextWindowExceeded2025_08_26,
+    Skills2025_10_02,
+    FastMode2026_02_01,
+    Output300k2026_03_24,
+    UserProfiles2026_03_24,
+    AdvisorTool2026_03_01,
+    ManagedAgents2026_04_01,
+    CacheDiagnosis2026_04_07,
+    ThinkingTokenCount2026_05_13,
+}
+
+sealed class AnthropicBetaConverter : JsonConverter<AnthropicBeta>
+{
+    public override AnthropicBeta Read(
+        ref Utf8JsonReader reader,
+        Type typeToConvert,
+        JsonSerializerOptions options
+    )
+    {
+        return JsonSerializer.Deserialize<string>(ref reader, options) switch
+        {
+            "message-batches-2024-09-24" => AnthropicBeta.MessageBatches2024_09_24,
+            "prompt-caching-2024-07-31" => AnthropicBeta.PromptCaching2024_07_31,
+            "computer-use-2024-10-22" => AnthropicBeta.ComputerUse2024_10_22,
+            "computer-use-2025-01-24" => AnthropicBeta.ComputerUse2025_01_24,
+            "pdfs-2024-09-25" => AnthropicBeta.Pdfs2024_09_25,
+            "token-counting-2024-11-01" => AnthropicBeta.TokenCounting2024_11_01,
+            "token-efficient-tools-2025-02-19" => AnthropicBeta.TokenEfficientTools2025_02_19,
+            "output-128k-2025-02-19" => AnthropicBeta.Output128k2025_02_19,
+            "files-api-2025-04-14" => AnthropicBeta.FilesApi2025_04_14,
+            "mcp-client-2025-04-04" => AnthropicBeta.McpClient2025_04_04,
+            "mcp-client-2025-11-20" => AnthropicBeta.McpClient2025_11_20,
+            "dev-full-thinking-2025-05-14" => AnthropicBeta.DevFullThinking2025_05_14,
+            "interleaved-thinking-2025-05-14" => AnthropicBeta.InterleavedThinking2025_05_14,
+            "code-execution-2025-05-22" => AnthropicBeta.CodeExecution2025_05_22,
+            "extended-cache-ttl-2025-04-11" => AnthropicBeta.ExtendedCacheTtl2025_04_11,
+            "context-1m-2025-08-07" => AnthropicBeta.Context1m2025_08_07,
+            "context-management-2025-06-27" => AnthropicBeta.ContextManagement2025_06_27,
+            "model-context-window-exceeded-2025-08-26" =>
+                AnthropicBeta.ModelContextWindowExceeded2025_08_26,
+            "skills-2025-10-02" => AnthropicBeta.Skills2025_10_02,
+            "fast-mode-2026-02-01" => AnthropicBeta.FastMode2026_02_01,
+            "output-300k-2026-03-24" => AnthropicBeta.Output300k2026_03_24,
+            "user-profiles-2026-03-24" => AnthropicBeta.UserProfiles2026_03_24,
+            "advisor-tool-2026-03-01" => AnthropicBeta.AdvisorTool2026_03_01,
+            "managed-agents-2026-04-01" => AnthropicBeta.ManagedAgents2026_04_01,
+            "cache-diagnosis-2026-04-07" => AnthropicBeta.CacheDiagnosis2026_04_07,
+            "thinking-token-count-2026-05-13" => AnthropicBeta.ThinkingTokenCount2026_05_13,
+            _ => (AnthropicBeta)(-1),
+        };
+    }
+
+    public override void Write(
+        Utf8JsonWriter writer,
+        AnthropicBeta value,
+        JsonSerializerOptions options
+    )
+    {
+        JsonSerializer.Serialize(
+            writer,
+            value switch
+            {
+                AnthropicBeta.MessageBatches2024_09_24 => "message-batches-2024-09-24",
+                AnthropicBeta.PromptCaching2024_07_31 => "prompt-caching-2024-07-31",
+                AnthropicBeta.ComputerUse2024_10_22 => "computer-use-2024-10-22",
+                AnthropicBeta.ComputerUse2025_01_24 => "computer-use-2025-01-24",
+                AnthropicBeta.Pdfs2024_09_25 => "pdfs-2024-09-25",
+                AnthropicBeta.TokenCounting2024_11_01 => "token-counting-2024-11-01",
+                AnthropicBeta.TokenEfficientTools2025_02_19 => "token-efficient-tools-2025-02-19",
+                AnthropicBeta.Output128k2025_02_19 => "output-128k-2025-02-19",
+                AnthropicBeta.FilesApi2025_04_14 => "files-api-2025-04-14",
+                AnthropicBeta.McpClient2025_04_04 => "mcp-client-2025-04-04",
+                AnthropicBeta.McpClient2025_11_20 => "mcp-client-2025-11-20",
+                AnthropicBeta.DevFullThinking2025_05_14 => "dev-full-thinking-2025-05-14",
+                AnthropicBeta.InterleavedThinking2025_05_14 => "interleaved-thinking-2025-05-14",
+                AnthropicBeta.CodeExecution2025_05_22 => "code-execution-2025-05-22",
+                AnthropicBeta.ExtendedCacheTtl2025_04_11 => "extended-cache-ttl-2025-04-11",
+                AnthropicBeta.Context1m2025_08_07 => "context-1m-2025-08-07",
+                AnthropicBeta.ContextManagement2025_06_27 => "context-management-2025-06-27",
+                AnthropicBeta.ModelContextWindowExceeded2025_08_26 =>
+                    "model-context-window-exceeded-2025-08-26",
+                AnthropicBeta.Skills2025_10_02 => "skills-2025-10-02",
+                AnthropicBeta.FastMode2026_02_01 => "fast-mode-2026-02-01",
+                AnthropicBeta.Output300k2026_03_24 => "output-300k-2026-03-24",
+                AnthropicBeta.UserProfiles2026_03_24 => "user-profiles-2026-03-24",
+                AnthropicBeta.AdvisorTool2026_03_01 => "advisor-tool-2026-03-01",
+                AnthropicBeta.ManagedAgents2026_04_01 => "managed-agents-2026-04-01",
+                AnthropicBeta.CacheDiagnosis2026_04_07 => "cache-diagnosis-2026-04-07",
+                AnthropicBeta.ThinkingTokenCount2026_05_13 => "thinking-token-count-2026-05-13",
+                _ => throw new AnthropicInvalidDataException(
+                    string.Format("Invalid value '{0}' in {1}", value, nameof(value))
+                ),
+            },
+            options
+        );
+    }
+}

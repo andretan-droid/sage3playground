@@ -1,0 +1,142 @@
+using System.Collections.Frozen;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Anthropic.Core;
+
+namespace Anthropic.Models.Messages;
+
+[JsonConverter(typeof(JsonModelConverter<MessageDeltaUsage, MessageDeltaUsageFromRaw>))]
+public sealed record class MessageDeltaUsage : JsonModel
+{
+    /// <summary>
+    /// The cumulative number of input tokens used to create the cache entry.
+    /// </summary>
+    public required long? CacheCreationInputTokens
+    {
+        get
+        {
+            this._rawData.Freeze();
+            return this._rawData.GetNullableStruct<long>("cache_creation_input_tokens");
+        }
+        init { this._rawData.Set("cache_creation_input_tokens", value); }
+    }
+
+    /// <summary>
+    /// The cumulative number of input tokens read from the cache.
+    /// </summary>
+    public required long? CacheReadInputTokens
+    {
+        get
+        {
+            this._rawData.Freeze();
+            return this._rawData.GetNullableStruct<long>("cache_read_input_tokens");
+        }
+        init { this._rawData.Set("cache_read_input_tokens", value); }
+    }
+
+    /// <summary>
+    /// The cumulative number of input tokens which were used.
+    /// </summary>
+    public required long? InputTokens
+    {
+        get
+        {
+            this._rawData.Freeze();
+            return this._rawData.GetNullableStruct<long>("input_tokens");
+        }
+        init { this._rawData.Set("input_tokens", value); }
+    }
+
+    /// <summary>
+    /// The cumulative number of output tokens which were used.
+    /// </summary>
+    public required long OutputTokens
+    {
+        get
+        {
+            this._rawData.Freeze();
+            return this._rawData.GetNotNullStruct<long>("output_tokens");
+        }
+        init { this._rawData.Set("output_tokens", value); }
+    }
+
+    /// <summary>
+    /// Breakdown of output tokens by category.
+    ///
+    /// <para>`output_tokens` remains the inclusive, authoritative total used for
+    /// billing. This object provides a read-only decomposition for observability
+    /// — for example, how many of the billed output tokens were spent on internal
+    /// reasoning that may have been summarized before being returned to you.</para>
+    /// </summary>
+    public required OutputTokensDetails? OutputTokensDetails
+    {
+        get
+        {
+            this._rawData.Freeze();
+            return this._rawData.GetNullableClass<OutputTokensDetails>("output_tokens_details");
+        }
+        init { this._rawData.Set("output_tokens_details", value); }
+    }
+
+    /// <summary>
+    /// The number of server tool requests.
+    /// </summary>
+    public required ServerToolUsage? ServerToolUse
+    {
+        get
+        {
+            this._rawData.Freeze();
+            return this._rawData.GetNullableClass<ServerToolUsage>("server_tool_use");
+        }
+        init { this._rawData.Set("server_tool_use", value); }
+    }
+
+    /// <inheritdoc/>
+    public override void Validate()
+    {
+        _ = this.CacheCreationInputTokens;
+        _ = this.CacheReadInputTokens;
+        _ = this.InputTokens;
+        _ = this.OutputTokens;
+        this.OutputTokensDetails?.Validate();
+        this.ServerToolUse?.Validate();
+    }
+
+    public MessageDeltaUsage() { }
+
+#pragma warning disable CS8618
+    [SetsRequiredMembers]
+    public MessageDeltaUsage(MessageDeltaUsage messageDeltaUsage)
+        : base(messageDeltaUsage) { }
+#pragma warning restore CS8618
+
+    public MessageDeltaUsage(IReadOnlyDictionary<string, JsonElement> rawData)
+    {
+        this._rawData = new(rawData);
+    }
+
+#pragma warning disable CS8618
+    [SetsRequiredMembers]
+    MessageDeltaUsage(FrozenDictionary<string, JsonElement> rawData)
+    {
+        this._rawData = new(rawData);
+    }
+#pragma warning restore CS8618
+
+    /// <inheritdoc cref="MessageDeltaUsageFromRaw.FromRawUnchecked"/>
+    public static MessageDeltaUsage FromRawUnchecked(
+        IReadOnlyDictionary<string, JsonElement> rawData
+    )
+    {
+        return new(FrozenDictionary.ToFrozenDictionary(rawData));
+    }
+}
+
+class MessageDeltaUsageFromRaw : IFromRawJson<MessageDeltaUsage>
+{
+    /// <inheritdoc/>
+    public MessageDeltaUsage FromRawUnchecked(IReadOnlyDictionary<string, JsonElement> rawData) =>
+        MessageDeltaUsage.FromRawUnchecked(rawData);
+}

@@ -1,0 +1,20 @@
+[package]
+name = "connectrpc-build"
+version = "0.6.1"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Build-time integration for connectrpc (use in build.rs)"
+keywords = ["connectrpc", "grpc", "protobuf", "build", "codegen"]
+categories = ["development-tools::build-utils"]
+
+[dependencies]
+connectrpc-codegen = { path = "../connectrpc-codegen", version = "0.6" }
+buffa = { workspace = true }
+buffa-codegen = { workspace = true }
+tempfile = { workspace = true }
+anyhow = { workspace = true }
+
+[lints]
+workspace = true

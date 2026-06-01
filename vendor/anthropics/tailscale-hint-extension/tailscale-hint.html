@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tailscale Connection Required</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+    :root {
+      --green: #48d597;
+      --green-dim: #2a7d58;
+      --bg: #080808;
+      --surface: #0d0d0d;
+      --border: #1a1a1a;
+      --text: #b0b0b0;
+      --text-bright: #e0e0e0;
+    }
+    body {
+      font-family: 'JetBrains Mono', 'SF Mono', Monaco, 'Cascadia Code', monospace;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .container {
+      text-align: center;
+      padding: 40px;
+      max-width: 720px;
+      width: 100%;
+    }
+    .icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 24px;
+      color: var(--green);
+    }
+    .icon svg {
+      width: 100%;
+      height: 100%;
+    }
+    h1 {
+      color: var(--text-bright);
+      font-size: 20px;
+      font-weight: 500;
+      margin: 0 0 12px 0;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+    }
+    .subtitle {
+      color: var(--text);
+      font-size: 13px;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    .subtitle code {
+      background: transparent;
+      color: var(--green);
+      padding: 0;
+      font-family: inherit;
+    }
+    .hostname {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 16px 24px;
+      font-size: 15px;
+      color: var(--green);
+      margin-bottom: 24px;
+      word-break: break-all;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 13px;
+      font-family: inherit;
+      border: 1px solid var(--green-dim);
+      background: transparent;
+      color: var(--green);
+      cursor: pointer;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.15s ease;
+    }
+    button:hover {
+      background: var(--green);
+      color: var(--bg);
+      border-color: var(--green);
+    }
+    button:active {
+      opacity: 0.8;
+    }
+    .help {
+      text-align: left;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px;
+      margin-top: 32px;
+    }
+    .help h3 {
+      color: var(--text-bright);
+      font-size: 12px;
+      font-weight: 500;
+      margin: 0 0 20px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .step {
+      border-left: 2px solid var(--border);
+      padding: 0 0 20px 20px;
+      margin-left: 8px;
+    }
+    .step:last-of-type {
+      padding-bottom: 0;
+      border-left-color: transparent;
+    }
+    .step-header {
+      font-weight: 500;
+      color: var(--text-bright);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
+    .step-num {
+      background: var(--bg);
+      border: 1px solid var(--green-dim);
+      color: var(--green);
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      flex-shrink: 0;
+      margin-left: -32px;
+    }
+    .step-content {
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    code {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--green);
+      padding: 4px 10px;
+      font-family: inherit;
+      font-size: 12px;
+      display: inline-block;
+    }
+    .copy-btn {
+      padding: 4px 10px;
+      font-size: 10px;
+      margin-left: 8px;
+      background: var(--surface);
+      border: 1px solid var(--green-dim);
+      color: var(--green);
+      cursor: pointer;
+      font-family: inherit;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.15s ease;
+    }
+    .copy-btn:hover {
+      background: var(--green);
+      border-color: var(--green);
+      color: var(--bg);
+    }
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+    .footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text);
+    }
+    .footer a {
+      color: var(--green);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.15s ease;
+    }
+    .footer a:hover {
+      border-bottom-color: var(--green);
+    }
+    strong {
+      color: var(--text-bright);
+      font-weight: 500;
+    }
+    .ping-monitor {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    .ping-section {
+      margin-bottom: 12px;
+    }
+    .ping-section:last-of-type {
+      margin-bottom: 0;
+    }
+    .ping-label {
+      font-size: 10px;
+      color: var(--text);
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+    }
+    .ping-graph {
+      display: flex;
+      height: 20px;
+      align-items: flex-end;
+      background: var(--bg);
+    }
+    .ping-bar {
+      flex: 1 1 0;
+      min-width: 0;
+      margin-right: 1px;
+      transition: background 0.15s, height 0.15s ease;
+    }
+    .ping-bar:last-child {
+      margin-right: 0;
+    }
+    .ping-label-hint {
+      color: var(--text);
+      opacity: 0.6;
+      font-weight: 400;
+    }
+    .ping-axis {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      color: var(--text);
+      opacity: 0.5;
+      margin-top: 4px;
+      padding: 0 2px;
+    }
+    .ping-legend {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--text);
+      margin-top: 12px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+    }
+    .legend-green { background: #48d597; }
+    .legend-red { background: #ff4444; }
+    .ping-status {
+      font-size: 11px;
+      margin-top: 12px;
+      color: var(--text);
+      letter-spacing: 0.02em;
+      text-align: center;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .ping-hint {
+      font-size: 10px;
+      color: var(--text);
+      opacity: 0.6;
+      text-align: center;
+      margin-top: 8px;
+    }
+    .ping-tooltip {
+      position: fixed;
+      background: var(--text-bright);
+      color: var(--bg);
+      padding: 2px 6px;
+      font-size: 10px;
+      font-family: inherit;
+      pointer-events: none;
+      display: none;
+      z-index: 1000;
+    }
+    .ping-monitor {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon" style="width: 80px; height: 80px;">
+      <!-- Tailscale logo with disconnected zigzag -->
+      <svg viewBox="0 0 32 32" fill="none">
+        <!-- Outer box -->
+        <rect x="1" y="1" width="30" height="30" stroke="#48d597" stroke-width="1" fill="none"/>
+        <!-- Top row: all green -->
+        <circle cx="8" cy="8" r="2.5" fill="#48d597"/>
+        <circle cx="16" cy="8" r="2.5" fill="#48d597"/>
+        <circle cx="24" cy="8" r="2.5" fill="#48d597"/>
+        <!-- Middle row: all white (T crossbar) -->
+        <circle cx="8" cy="16" r="2.5" fill="#e0e0e0"/>
+        <circle cx="16" cy="16" r="2.5" fill="#e0e0e0"/>
+        <circle cx="24" cy="16" r="2.5" fill="#e0e0e0"/>
+        <!-- Bottom row: green, white, green -->
+        <circle cx="8" cy="24" r="2.5" fill="#48d597"/>
+        <circle cx="16" cy="24" r="2.5" fill="#e0e0e0"/>
+        <circle cx="24" cy="24" r="2.5" fill="#48d597"/>
+      </svg>
+    </div>
+    <h1>Tailscale Connection Required</h1>
+    <p class="subtitle">
+      This <code>.local</code> domain uses Tailscale MagicDNS and requires an active connection.
+    </p>
+    <div class="hostname" id="hostname">Loading...</div>
+    <div class="ping-monitor">
+      <div class="ping-section">
+        <div class="ping-label">YOUR SERVICE</div>
+        <div id="ping-graph-target" class="ping-graph"></div>
+      </div>
+      <div class="ping-section">
+        <div class="ping-label"><span id="dns-label">TAILSCALE</span> <span class="ping-label-hint">(infrastructure check)</span></div>
+        <div id="ping-graph-dns" class="ping-graph"></div>
+      </div>
+      <div class="ping-axis">
+        <span>60s ago</span>
+        <span>now</span>
+      </div>
+      <div class="ping-legend">
+        <span class="legend-item"><span class="legend-dot legend-green"></span> reachable</span>
+        <span class="legend-item"><span class="legend-dot legend-red"></span> unreachable</span>
+      </div>
+      <div id="ping-status" class="ping-status">Checking...</div>
+      <div class="ping-hint">
+        Both red = Tailscale disconnected · Top red, bottom green = service is down
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button class="secondary" id="btn-retry">Retry Connection</button>
+    </div>
+    <p class="subtitle" style="margin-top: 0;">
+      Check your <strong>menu bar</strong> for the Tailscale icon, or run <code>tailscale up</code> in Terminal.
+    </p>
+
+    <div class="help">
+      <h3>Troubleshooting</h3>
+
+      <div class="step">
+        <div class="step-header">
+          <span class="step-num">1</span>
+          Check Tailscale Status
+        </div>
+        <div class="step-content">
+          <code>tailscale status</code>
+          <button class="copy-btn" data-cmd="tailscale status">Copy</button>
+          <br><br>
+          You should see a list of devices. If empty or errored, run:
+          <br><br>
+          <code>tailscale up</code>
+          <button class="copy-btn" data-cmd="tailscale up">Copy</button>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-header">
+          <span class="step-num">2</span>
+          Verify DNS Resolution
+        </div>
+        <div class="step-content">
+          <code>dig +short @100.100.100.100 dns.ant.dev</code>
+          <button class="copy-btn" data-cmd="dig +short @100.100.100.100 dns.ant.dev">Copy</button>
+          <br><br>
+          If this fails, Tailscale DNS is not working.
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-header">
+          <span class="step-num">3</span>
+          Check Chrome Settings
+        </div>
+        <div class="step-content">
+          Go to <strong>System Settings &rarr; Privacy &amp; Security &rarr; Local Network</strong> and ensure <strong>Google Chrome Helper (GPU)</strong> is enabled.
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-header">
+          <span class="step-num">4</span>
+          Secretive Issues?
+        </div>
+        <div class="step-content">
+          If using Secretive for SSH keys, try resetting:
+          <br><br>
+          <code>pkill -f secretive &amp;&amp; security unlock-keychain</code>
+          <button class="copy-btn" data-cmd="pkill -f secretive && security unlock-keychain">Copy</button>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-header">
+          <span class="step-num">5</span>
+          Full Network Check
+        </div>
+        <div class="step-content">
+          <code>tailscale netcheck</code>
+          <button class="copy-btn" data-cmd="tailscale netcheck">Copy</button>
+          <br><br>
+          Check DNS config:
+          <br><br>
+          <code>scutil --dns</code>
+          <button class="copy-btn" data-cmd="scutil --dns">Copy</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="footer">
+        Still stuck? Ask in <a href="https://anthropic.enterprise.slack.com/archives/C091R8FLWV7" target="_blank">#infra-assist</a>
+        &middot; <a href="https://outline.ant.dev/doc/getting-started-with-tailscale-dFi7F1264Y" target="_blank">Full docs</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="ping-tooltip" class="ping-tooltip"></div>
+  <script src="hint.js"></script>
+</body>
+</html>

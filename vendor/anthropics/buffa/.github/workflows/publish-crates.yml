@@ -1,0 +1,102 @@
+name: Publish to crates.io
+
+# Publishes all workspace crates to crates.io in dependency order.
+#
+# Auth: uses the CARGO_REGISTRY_TOKEN secret when present (bootstrap path —
+# crates.io can't configure Trusted Publishing for a crate that doesn't exist
+# yet), otherwise exchanges the GitHub OIDC token for a short-lived crates.io
+# token. Once Trusted Publishing is configured per crate and the secret is
+# removed, publishes run entirely over OIDC with no stored credentials.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: >-
+          Run cargo publish --dry-run (no upload, no auth). Note: only the
+          leaf crate (buffa) fully verifies — downstream crates resolve deps
+          from crates.io, not the workspace, so they fail verification until
+          buffa is actually published. That failure is expected.
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  id-token: write  # OIDC for crates.io Trusted Publishing
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    # GitHub Environment: part of the Trusted Publishing trust config on
+    # crates.io, and lets you add a required-reviewer approval gate.
+    environment: crates-io
+    env:
+      DRY_RUN_FLAG: ${{ inputs.dry_run && '--dry-run' || '' }}
+      # Bootstrap token. Empty if secret is unset → Trusted Publishing path.
+      CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      # OIDC token exchange. Skipped in dry-run (never hits crates.io) and
+      # bootstrap (secret present). The action's post-step revokes the token.
+      - name: Authenticate (Trusted Publishing)
+        id: auth
+        if: ${{ !inputs.dry_run && env.CARGO_REGISTRY_TOKEN == '' }}
+        uses: rust-lang/crates-io-auth-action@bbd81622f20ce9e2dd9622e3218b975523e45bbe # v1.0.4 (sha-pinned)
+
+      - name: Use Trusted Publishing token
+        if: ${{ steps.auth.outputs.token != '' }}
+        run: echo "CARGO_REGISTRY_TOKEN=${{ steps.auth.outputs.token }}" >> "$GITHUB_ENV"
+
+      # Dependency order. cargo publish (≥1.66) blocks until the crate is
+      # indexed, so sequential steps work without manual delays.
+      #
+      # Each step is idempotent: if the crate is already published at this
+      # version, the step logs a notice and succeeds. Re-running the workflow
+      # after a partial failure skips what's done and picks up where it left
+      # off. No manual edit-and-rerun needed.
+
+      - name: Create idempotent publish helper
+        run: |
+          cat > /tmp/publish.sh << 'EOF'
+          #!/bin/bash
+          set -o pipefail
+          crate="$1"; shift
+          cargo publish -p "$crate" "$@" 2>&1 | tee /tmp/publish.log
+          status=${PIPESTATUS[0]}
+          if [ $status -ne 0 ] && grep -qE "already (exists|uploaded)" /tmp/publish.log; then
+            echo "::notice::$crate already published at this version; skipping"
+            exit 0
+          fi
+          exit $status
+          EOF
+          chmod +x /tmp/publish.sh
+
+      - name: Publish buffa
+        run: /tmp/publish.sh buffa $DRY_RUN_FLAG
+
+      # buffa-descriptor must precede buffa-types: buffa-types' `reflect`
+      # feature has an optional buffa-descriptor dependency, and cargo publish
+      # requires optional deps to be resolvable from the index too.
+      - name: Publish buffa-descriptor
+        run: /tmp/publish.sh buffa-descriptor $DRY_RUN_FLAG
+
+      - name: Publish buffa-types
+        run: /tmp/publish.sh buffa-types $DRY_RUN_FLAG
+
+      - name: Publish buffa-codegen
+        run: /tmp/publish.sh buffa-codegen $DRY_RUN_FLAG
+
+      - name: Publish buffa-build
+        run: /tmp/publish.sh buffa-build $DRY_RUN_FLAG
+
+      - name: Publish protoc-gen-buffa
+        run: /tmp/publish.sh protoc-gen-buffa $DRY_RUN_FLAG
+
+      - name: Publish protoc-gen-buffa-packaging
+        run: /tmp/publish.sh protoc-gen-buffa-packaging $DRY_RUN_FLAG

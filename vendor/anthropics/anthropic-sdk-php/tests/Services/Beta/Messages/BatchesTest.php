@@ -1,0 +1,216 @@
+<?php
+
+namespace Tests\Services\Beta\Messages;
+
+use Anthropic\Beta\Messages\Batches\DeletedMessageBatch;
+use Anthropic\Beta\Messages\Batches\MessageBatch;
+use Anthropic\Client;
+use Anthropic\Core\Util;
+use Anthropic\Page;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
+use Tests\UnsupportedMockTests;
+
+/**
+ * @internal
+ */
+#[CoversNothing]
+final class BatchesTest extends TestCase
+{
+    protected Client $client;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $testUrl = Util::getenv('TEST_API_BASE_URL') ?: 'http://127.0.0.1:4010';
+        $client = new Client(apiKey: 'my-anthropic-api-key', baseUrl: $testUrl);
+
+        $this->client = $client;
+    }
+
+    #[Test]
+    public function testCreate(): void
+    {
+        $result = $this->client->beta->messages->batches->create(
+            requests: [
+                [
+                    'customID' => 'my-custom-id-1',
+                    'params' => [
+                        'maxTokens' => 1024,
+                        'messages' => [['content' => 'Hello, world', 'role' => 'user']],
+                        'model' => 'claude-opus-4-6',
+                    ],
+                ],
+            ],
+        );
+
+        // @phpstan-ignore-next-line method.alreadyNarrowedType
+        $this->assertInstanceOf(MessageBatch::class, $result);
+    }
+
+    #[Test]
+    public function testCreateWithOptionalParams(): void
+    {
+        $result = $this->client->beta->messages->batches->create(
+            requests: [
+                [
+                    'customID' => 'my-custom-id-1',
+                    'params' => [
+                        'maxTokens' => 1024,
+                        'messages' => [['content' => 'Hello, world', 'role' => 'user']],
+                        'model' => 'claude-opus-4-6',
+                        'cacheControl' => ['type' => 'ephemeral', 'ttl' => '5m'],
+                        'container' => [
+                            'id' => 'id',
+                            'skills' => [
+                                [
+                                    'skillID' => 'pdf',
+                                    'type' => 'anthropic',
+                                    'version' => 'latest',
+                                ],
+                            ],
+                        ],
+                        'contextManagement' => [
+                            'edits' => [
+                                [
+                                    'type' => 'clear_tool_uses_20250919',
+                                    'clearAtLeast' => ['type' => 'input_tokens', 'value' => 0],
+                                    'clearToolInputs' => true,
+                                    'excludeTools' => ['string'],
+                                    'keep' => ['type' => 'tool_uses', 'value' => 0],
+                                    'trigger' => ['type' => 'input_tokens', 'value' => 1],
+                                ],
+                            ],
+                        ],
+                        'diagnostics' => ['previousMessageID' => 'previous_message_id'],
+                        'inferenceGeo' => 'inference_geo',
+                        'mcpServers' => [
+                            [
+                                'name' => 'name',
+                                'type' => 'url',
+                                'url' => 'url',
+                                'authorizationToken' => 'authorization_token',
+                                'toolConfiguration' => [
+                                    'allowedTools' => ['string'], 'enabled' => true,
+                                ],
+                            ],
+                        ],
+                        'metadata' => ['userID' => '13803d75-b4b5-4c3e-b2a2-6f21399b021b'],
+                        'outputConfig' => [
+                            'effort' => 'low',
+                            'format' => [
+                                'schema' => ['foo' => 'bar'], 'type' => 'json_schema',
+                            ],
+                            'taskBudget' => [
+                                'total' => 1024, 'type' => 'tokens', 'remaining' => 0,
+                            ],
+                        ],
+                        'outputFormat' => [
+                            'schema' => ['foo' => 'bar'], 'type' => 'json_schema',
+                        ],
+                        'serviceTier' => 'auto',
+                        'speed' => 'standard',
+                        'stopSequences' => ['string'],
+                        'stream' => true,
+                        'system' => [
+                            [
+                                'text' => 'Today\'s date is 2024-06-01.',
+                                'type' => 'text',
+                                'cacheControl' => ['type' => 'ephemeral', 'ttl' => '5m'],
+                                'citations' => [
+                                    [
+                                        'citedText' => 'cited_text',
+                                        'documentIndex' => 0,
+                                        'documentTitle' => 'x',
+                                        'endCharIndex' => 0,
+                                        'startCharIndex' => 0,
+                                        'type' => 'char_location',
+                                    ],
+                                ],
+                            ],
+                        ],
+                        'temperature' => 1,
+                        'thinking' => ['type' => 'adaptive', 'display' => 'summarized'],
+                        'toolChoice' => [
+                            'type' => 'auto', 'disableParallelToolUse' => true,
+                        ],
+                        'tools' => [
+                            [
+                                'inputSchema' => [
+                                    'type' => 'object',
+                                    'properties' => ['location' => 'bar', 'unit' => 'bar'],
+                                    'required' => ['location'],
+                                ],
+                                'name' => 'name',
+                                'allowedCallers' => ['direct'],
+                                'cacheControl' => ['type' => 'ephemeral', 'ttl' => '5m'],
+                                'deferLoading' => true,
+                                'description' => 'Get the current weather in a given location',
+                                'eagerInputStreaming' => true,
+                                'inputExamples' => [['foo' => 'bar']],
+                                'strict' => true,
+                                'type' => 'custom',
+                            ],
+                        ],
+                        'topK' => 5,
+                        'topP' => 0.7,
+                        'userProfileID' => 'user_profile_id',
+                    ],
+                ],
+            ],
+            betas: ['message-batches-2024-09-24'],
+        );
+
+        // @phpstan-ignore-next-line method.alreadyNarrowedType
+        $this->assertInstanceOf(MessageBatch::class, $result);
+    }
+
+    #[Test]
+    public function testRetrieve(): void
+    {
+        $result = $this->client->beta->messages->batches->retrieve(
+            'message_batch_id'
+        );
+
+        // @phpstan-ignore-next-line method.alreadyNarrowedType
+        $this->assertInstanceOf(MessageBatch::class, $result);
+    }
+
+    #[Test]
+    public function testList(): void
+    {
+        $page = $this->client->beta->messages->batches->list();
+
+        // @phpstan-ignore-next-line method.alreadyNarrowedType
+        $this->assertInstanceOf(Page::class, $page);
+
+        if ($item = $page->getItems()[0] ?? null) {
+            // @phpstan-ignore-next-line method.alreadyNarrowedType
+            $this->assertInstanceOf(MessageBatch::class, $item);
+        }
+    }
+
+    #[Test]
+    public function testDelete(): void
+    {
+        $result = $this->client->beta->messages->batches->delete(
+            'message_batch_id'
+        );
+
+        // @phpstan-ignore-next-line method.alreadyNarrowedType
+        $this->assertInstanceOf(DeletedMessageBatch::class, $result);
+    }
+
+    #[Test]
+    public function testCancel(): void
+    {
+        $result = $this->client->beta->messages->batches->cancel(
+            'message_batch_id'
+        );
+
+        // @phpstan-ignore-next-line method.alreadyNarrowedType
+        $this->assertInstanceOf(MessageBatch::class, $result);
+    }
+}

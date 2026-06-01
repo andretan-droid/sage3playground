@@ -1,0 +1,72 @@
+using System.Text.Json;
+using Anthropic.Core;
+using Anthropic.Models.Beta.Messages;
+
+namespace Anthropic.Tests.Models.Beta.Messages;
+
+public class BetaWebSearchToolResultBlockParamContentTest : TestBase
+{
+    [Fact]
+    public void ResultBlockValidationWorks()
+    {
+        BetaWebSearchToolResultBlockParamContent value = new(
+            [
+                new BetaWebSearchResultBlockParam()
+                {
+                    EncryptedContent = "encrypted_content",
+                    Title = "title",
+                    Url = "url",
+                    PageAge = "page_age",
+                },
+            ]
+        );
+        value.Validate();
+    }
+
+    [Fact]
+    public void RequestErrorValidationWorks()
+    {
+        BetaWebSearchToolResultBlockParamContent value = new BetaWebSearchToolRequestError(
+            BetaWebSearchToolResultErrorCode.InvalidToolInput
+        );
+        value.Validate();
+    }
+
+    [Fact]
+    public void ResultBlockSerializationRoundtripWorks()
+    {
+        BetaWebSearchToolResultBlockParamContent value = new(
+            [
+                new BetaWebSearchResultBlockParam()
+                {
+                    EncryptedContent = "encrypted_content",
+                    Title = "title",
+                    Url = "url",
+                    PageAge = "page_age",
+                },
+            ]
+        );
+        string element = JsonSerializer.Serialize(value, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<BetaWebSearchToolResultBlockParamContent>(
+            element,
+            ModelBase.SerializerOptions
+        );
+
+        Assert.Equal(value, deserialized);
+    }
+
+    [Fact]
+    public void RequestErrorSerializationRoundtripWorks()
+    {
+        BetaWebSearchToolResultBlockParamContent value = new BetaWebSearchToolRequestError(
+            BetaWebSearchToolResultErrorCode.InvalidToolInput
+        );
+        string element = JsonSerializer.Serialize(value, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<BetaWebSearchToolResultBlockParamContent>(
+            element,
+            ModelBase.SerializerOptions
+        );
+
+        Assert.Equal(value, deserialized);
+    }
+}

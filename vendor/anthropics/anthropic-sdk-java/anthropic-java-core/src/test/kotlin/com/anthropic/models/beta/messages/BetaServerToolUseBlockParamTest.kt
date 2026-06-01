@@ -1,0 +1,81 @@
+// File generated from our OpenAPI spec by Stainless.
+
+package com.anthropic.models.beta.messages
+
+import com.anthropic.core.JsonValue
+import com.anthropic.core.jsonMapper
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
+
+internal class BetaServerToolUseBlockParamTest {
+
+    @Test
+    fun create() {
+        val betaServerToolUseBlockParam =
+            BetaServerToolUseBlockParam.builder()
+                .id("srvtoolu_SQfNkl1n_JR_")
+                .input(
+                    BetaServerToolUseBlockParam.Input.builder()
+                        .putAdditionalProperty("foo", JsonValue.from("bar"))
+                        .build()
+                )
+                .name(BetaServerToolUseBlockParam.Name.ADVISOR)
+                .cacheControl(
+                    BetaCacheControlEphemeral.builder()
+                        .ttl(BetaCacheControlEphemeral.Ttl.TTL_5M)
+                        .build()
+                )
+                .caller(BetaDirectCaller.builder().build())
+                .build()
+
+        assertThat(betaServerToolUseBlockParam.id()).isEqualTo("srvtoolu_SQfNkl1n_JR_")
+        assertThat(betaServerToolUseBlockParam.input())
+            .isEqualTo(
+                BetaServerToolUseBlockParam.Input.builder()
+                    .putAdditionalProperty("foo", JsonValue.from("bar"))
+                    .build()
+            )
+        assertThat(betaServerToolUseBlockParam.name())
+            .isEqualTo(BetaServerToolUseBlockParam.Name.ADVISOR)
+        assertThat(betaServerToolUseBlockParam.cacheControl())
+            .contains(
+                BetaCacheControlEphemeral.builder()
+                    .ttl(BetaCacheControlEphemeral.Ttl.TTL_5M)
+                    .build()
+            )
+        assertThat(betaServerToolUseBlockParam.caller())
+            .contains(
+                BetaServerToolUseBlockParam.Caller.ofDirect(BetaDirectCaller.builder().build())
+            )
+    }
+
+    @Test
+    fun roundtrip() {
+        val jsonMapper = jsonMapper()
+        val betaServerToolUseBlockParam =
+            BetaServerToolUseBlockParam.builder()
+                .id("srvtoolu_SQfNkl1n_JR_")
+                .input(
+                    BetaServerToolUseBlockParam.Input.builder()
+                        .putAdditionalProperty("foo", JsonValue.from("bar"))
+                        .build()
+                )
+                .name(BetaServerToolUseBlockParam.Name.ADVISOR)
+                .cacheControl(
+                    BetaCacheControlEphemeral.builder()
+                        .ttl(BetaCacheControlEphemeral.Ttl.TTL_5M)
+                        .build()
+                )
+                .caller(BetaDirectCaller.builder().build())
+                .build()
+
+        val roundtrippedBetaServerToolUseBlockParam =
+            jsonMapper.readValue(
+                jsonMapper.writeValueAsString(betaServerToolUseBlockParam),
+                jacksonTypeRef<BetaServerToolUseBlockParam>(),
+            )
+
+        assertThat(roundtrippedBetaServerToolUseBlockParam).isEqualTo(betaServerToolUseBlockParam)
+    }
+}

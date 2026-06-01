@@ -1,0 +1,177 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
+using Anthropic.Aws;
+using Anthropic.Bedrock;
+using Anthropic.Core;
+using Anthropic.Foundry;
+using Anthropic.Vertex;
+using Xunit.Sdk;
+using Xunit.v3;
+
+namespace Anthropic.Tests;
+
+public class AnthropicTestClientsAttribute : DataAttribute
+{
+    public static string DataServiceUrl { get; } =
+        Environment.GetEnvironmentVariable("TEST_API_BASE_URL") ?? "http://localhost:4010";
+    public static string ApiKey { get; } = "YourApiKeyHere";
+    public static string Resource { get; } = "YourRegionOrResourceHere";
+
+    public AnthropicTestClientsAttribute(TestSupportTypes testSupportTypes = TestSupportTypes.All)
+    {
+        TestSupportTypes = testSupportTypes;
+    }
+
+    public TestSupportTypes TestSupportTypes { get; }
+
+    // Constructing a client is somewhat expensive so we'd prefer it only happens once.
+    public override bool SupportsDiscoveryEnumeration() => false;
+
+    public override ValueTask<IReadOnlyCollection<ITheoryDataRow>> GetData(
+        MethodInfo testMethod,
+        DisposalTracker disposalTracker
+    )
+    {
+        var testData = testMethod.GetCustomAttributes<AnthropicTestDataAttribute>().ToArray();
+        var rows = new List<ITheoryDataRow>();
+
+        if (TestSupportTypes.HasFlag(TestSupportTypes.Anthropic))
+        {
+            rows.Add(
+                new TheoryDataRow(
+                    [
+                        new AnthropicClient(
+                            new ClientOptions { ApiKey = ApiKey, BaseUrl = DataServiceUrl }
+                        ),
+                        .. testData
+                            .Where(e => e.TestSupport.HasFlag(TestSupportTypes.Anthropic))
+                            .SelectMany(f => f.TestData)
+                            .ToArray(),
+                    ]
+                )
+            );
+        }
+        if (TestSupportTypes.HasFlag(TestSupportTypes.Foundry))
+        {
+            rows.Add(
+                new TheoryDataRow(
+                    [
+                        new AnthropicFoundryClient(
+                            new AnthropicFoundryApiKeyCredentials(ApiKey, Resource!)
+                        )
+                        {
+                            BaseUrl = DataServiceUrl,
+                        },
+                        .. testData
+                            .Where(e => e.TestSupport.HasFlag(TestSupportTypes.Foundry))
+                            .SelectMany(f => f.TestData)
+                            .ToArray(),
+                    ]
+                )
+            );
+        }
+        if (TestSupportTypes.HasFlag(TestSupportTypes.Bedrock))
+        {
+            rows.Add(
+                new TheoryDataRow(
+                    [
+                        new AnthropicBedrockClient(
+                            new AnthropicBedrockApiTokenCredentials()
+                            {
+                                BearerToken = ApiKey,
+                                Region = Resource,
+                            }
+                        )
+                        {
+                            BaseUrl = DataServiceUrl,
+                        },
+                        .. testData
+                            .Where(e => e.TestSupport.HasFlag(TestSupportTypes.Bedrock))
+                            .SelectMany(f => f.TestData)
+                            .ToArray(),
+                    ]
+                )
+            );
+        }
+        if (TestSupportTypes.HasFlag(TestSupportTypes.Aws))
+        {
+            rows.Add(
+                new TheoryDataRow(
+                    [
+                        new AnthropicAwsClient(new() { ApiKey = ApiKey, BaseUrl = DataServiceUrl }),
+                        .. testData
+                            .Where(e => e.TestSupport.HasFlag(TestSupportTypes.Aws))
+                            .SelectMany(f => f.TestData)
+                            .ToArray(),
+                    ]
+                )
+            );
+        }
+        if (TestSupportTypes.HasFlag(TestSupportTypes.Vertex))
+        {
+            rows.Add(
+                new TheoryDataRow(
+                    [
+                        new AnthropicVertexClient(
+                            new AnthropicVertexCredentials(Resource, "VertexProject")
+                        )
+                        {
+                            BaseUrl = DataServiceUrl,
+                        },
+                        .. testData
+                            .Where(e => e.TestSupport.HasFlag(TestSupportTypes.Vertex))
+                            .SelectMany(f => f.TestData)
+                            .ToArray(),
+                    ]
+                )
+            );
+        }
+
+        if (TestSupportTypes.HasFlag(TestSupportTypes.BedrockMantle))
+        {
+            rows.Add(
+                new TheoryDataRow(
+                    [
+                        new AnthropicBedrockMantleClient(
+                            new() { ApiKey = ApiKey, BaseUrl = DataServiceUrl }
+                        ),
+                        .. testData
+                            .Where(e => e.TestSupport.HasFlag(TestSupportTypes.BedrockMantle))
+                            .SelectMany(f => f.TestData)
+                            .ToArray(),
+                    ]
+                )
+            );
+        }
+
+        return new ValueTask<IReadOnlyCollection<ITheoryDataRow>>(rows);
+    }
+}
+
+[AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
+sealed class AnthropicTestDataAttribute : Attribute
+{
+    public AnthropicTestDataAttribute(TestSupportTypes testSupport, params object[] testData)
+    {
+        TestSupport = testSupport;
+        TestData = testData;
+    }
+
+    public TestSupportTypes TestSupport { get; }
+    public object[] TestData { get; }
+}
+
+[Flags]
+public enum TestSupportTypes
+{
+    All = Anthropic | Foundry | Aws,
+    Anthropic = 1 << 1,
+    Foundry = 1 << 2,
+    Bedrock = 1 << 3,
+    Vertex = 1 << 4,
+    Aws = 1 << 5,
+    BedrockMantle = 1 << 6,
+}

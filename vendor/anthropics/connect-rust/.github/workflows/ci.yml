@@ -1,0 +1,245 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -Dwarnings
+  # Pinned protoc version for proto edition="2023" compatibility.
+  # Installed via arduino/setup-protoc, which caches across runs.
+  PROTOC_VERSION: "33.5"
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1 (sha-pinned)
+      - uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3.0.0 (sha-pinned)
+        with:
+          version: ${{ env.PROTOC_VERSION }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - run: cargo check --workspace --all-features --all-targets
+
+  msrv-check:
+    name: MSRV (1.88)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.88'
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1 (sha-pinned)
+      - uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3.0.0 (sha-pinned)
+        with:
+          version: ${{ env.PROTOC_VERSION }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - run: cargo check --workspace --all-features --all-targets
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1 (sha-pinned)
+      - uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3.0.0 (sha-pinned)
+        with:
+          version: ${{ env.PROTOC_VERSION }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - run: cargo test --workspace --all-features
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1 (sha-pinned)
+      - uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3.0.0 (sha-pinned)
+        with:
+          version: ${{ env.PROTOC_VERSION }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - run: cargo clippy --workspace --all-features --all-targets -- -D warnings
+
+  fmt:
+    name: Format
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
+      - run: cargo +nightly fmt --all -- --check
+
+  check-generated-code:
+    name: Check generated code
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Note: the workspace has no committed Cargo.lock, so `cargo
+    # generate-lockfile` below resolves buffa and prettyplease (which formats
+    # the generated code) to the latest compatible releases at run time. A new
+    # release of either can therefore make this job fail on PRs that did not
+    # touch the protos or codegen — the fix is to run `task generate:all` on
+    # main and commit the resulting diff.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1 (sha-pinned)
+      - uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3.0.0 (sha-pinned)
+        with:
+          version: ${{ env.PROTOC_VERSION }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: bufbuild/buf-action@fd21066df7214747548607aaa45548ba2b9bc1ff # v1 (sha-pinned)
+        with:
+          setup_only: true
+          # Pinned so the job's behaviour does not drift with new buf
+          # releases; keep in sync with the version used for local
+          # regeneration when bumping.
+          version: 1.69.0
+      - uses: go-task/setup-task@01a4adf9db2d14c1de7a560f09170b6e0df736aa # v2 (sha-pinned)
+      - name: Generate lockfile
+        run: cargo generate-lockfile
+      - name: Resolve locked buffa version
+        id: buffa-version
+        shell: bash
+        run: |
+          version="$(awk '
+            $0 == "[[package]]" { in_buffa = 0 }
+            $0 == "name = \"buffa\"" { in_buffa = 1 }
+            in_buffa && $1 == "version" {
+              gsub(/"/, "", $3)
+              print $3
+              exit
+            }
+          ' Cargo.lock)"
+
+          if [ -z "$version" ]; then
+            echo "::error::Could not find the buffa package version in Cargo.lock"
+            exit 1
+          fi
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          repository: anthropics/buffa
+          ref: v${{ steps.buffa-version.outputs.version }}
+          path: buffa
+      - name: Link buffa sibling checkout
+        shell: bash
+        run: ln -sfn "$PWD/buffa" ../buffa
+      - run: task generate:all
+      - name: Verify checked-in generated code is current
+        run: |
+          if ! git diff --exit-code -- \
+            conformance/src/generated \
+            examples/eliza/src/generated \
+            examples/multiservice/src/generated \
+            benches/rpc/src/generated; then
+            echo "::error::Checked-in generated code is stale. Run 'task generate:all' and commit the diff."
+            exit 1
+          fi
+
+  doc:
+    name: Documentation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      RUSTDOCFLAGS: -Dwarnings
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1 (sha-pinned)
+      - uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3.0.0 (sha-pinned)
+        with:
+          version: ${{ env.PROTOC_VERSION }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - run: cargo doc --workspace --all-features --no-deps
+
+  # Integration test: start server, run client, verify RPCs work end-to-end
+  examples:
+    name: Examples
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1 (sha-pinned)
+      # No protoc needed: multiservice uses checked-in generated code
+      - run: ./examples/multiservice/test.sh
+
+  # Conformance tests: validate protocol compliance.
+  # Matrix runs server and client suites in parallel — the server suite
+  # (~20s) finishes in the shadow of the client suite (~90s), so the
+  # duplicated build is net-faster than running both serially.
+  conformance:
+    name: Conformance (${{ matrix.mode }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - mode: server
+            config: conformance/config/connect-only.yaml
+            bin: conformance-server
+          - mode: client
+            config: conformance/config/client-connect-only.yaml
+            bin: conformance-client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1 (sha-pinned)
+      - name: Download conformance runner
+        run: ./conformance/scripts/download-conformance.sh
+      - name: Build conformance binary
+        run: cargo build --release -p connectrpc-conformance --bin ${{ matrix.bin }}
+      - name: Run conformance suite
+        run: |
+          ./conformance/bin/connectconformance --mode ${{ matrix.mode }} \
+            --conf ${{ matrix.config }} \
+            -- ./target/release/${{ matrix.bin }}
+
+  # Verify wasm32 compilation and run browser integration tests
+  wasm:
+    name: Wasm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1 (sha-pinned)
+      - uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3.0.0 (sha-pinned)
+        with:
+          version: ${{ env.PROTOC_VERSION }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+      - run: cargo check -p connectrpc --no-default-features --target wasm32-unknown-unknown
+      - run: cargo check -p connectrpc --no-default-features --features gzip --target wasm32-unknown-unknown
+      - run: ./examples/wasm-client/test.sh
+
+  # Test with minimal feature set
+  minimal:
+    name: Minimal features
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1 (sha-pinned)
+      - run: cargo check -p connectrpc --no-default-features
+      - run: cargo test -p connectrpc --no-default-features

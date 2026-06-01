@@ -1,0 +1,242 @@
+using System.Text.Json;
+using Anthropic.Core;
+using Anthropic.Models.Beta.Sessions.Events;
+
+namespace Anthropic.Tests.Models.Beta.Sessions.Events;
+
+public class BetaManagedAgentsEventParamsTest : TestBase
+{
+    [Fact]
+    public void UserMessageValidationWorks()
+    {
+        BetaManagedAgentsEventParams value = new BetaManagedAgentsUserMessageEventParams()
+        {
+            Content =
+            [
+                new BetaManagedAgentsTextBlock()
+                {
+                    Text = "Where is my order #1234?",
+                    Type = BetaManagedAgentsTextBlockType.Text,
+                },
+            ],
+            Type = BetaManagedAgentsUserMessageEventParamsType.UserMessage,
+        };
+        value.Validate();
+    }
+
+    [Fact]
+    public void UserInterruptValidationWorks()
+    {
+        BetaManagedAgentsEventParams value = new BetaManagedAgentsUserInterruptEventParams()
+        {
+            Type = BetaManagedAgentsUserInterruptEventParamsType.UserInterrupt,
+            SessionThreadID = "session_thread_id",
+        };
+        value.Validate();
+    }
+
+    [Fact]
+    public void UserToolConfirmationValidationWorks()
+    {
+        BetaManagedAgentsEventParams value = new BetaManagedAgentsUserToolConfirmationEventParams()
+        {
+            Result = BetaManagedAgentsUserToolConfirmationEventParamsResult.Allow,
+            ToolUseID = "x",
+            Type = BetaManagedAgentsUserToolConfirmationEventParamsType.UserToolConfirmation,
+            DenyMessage = "deny_message",
+        };
+        value.Validate();
+    }
+
+    [Fact]
+    public void UserCustomToolResultValidationWorks()
+    {
+        BetaManagedAgentsEventParams value = new BetaManagedAgentsUserCustomToolResultEventParams()
+        {
+            CustomToolUseID = "x",
+            Type = BetaManagedAgentsUserCustomToolResultEventParamsType.UserCustomToolResult,
+            Content =
+            [
+                new BetaManagedAgentsTextBlock()
+                {
+                    Text = "Where is my order #1234?",
+                    Type = BetaManagedAgentsTextBlockType.Text,
+                },
+            ],
+            IsError = true,
+        };
+        value.Validate();
+    }
+
+    [Fact]
+    public void UserDefineOutcomeValidationWorks()
+    {
+        BetaManagedAgentsEventParams value = new BetaManagedAgentsUserDefineOutcomeEventParams()
+        {
+            Description = "Produce a 2-page summary as summary.md",
+            Rubric = new BetaManagedAgentsTextRubricParams()
+            {
+                Content = "Must cover all five sections; cite sources inline.",
+                Type = BetaManagedAgentsTextRubricParamsType.Text,
+            },
+            Type = BetaManagedAgentsUserDefineOutcomeEventParamsType.UserDefineOutcome,
+            MaxIterations = 3,
+        };
+        value.Validate();
+    }
+
+    [Fact]
+    public void UserToolResultValidationWorks()
+    {
+        BetaManagedAgentsEventParams value = new BetaManagedAgentsUserToolResultEventParams()
+        {
+            ToolUseID = "x",
+            Type = BetaManagedAgentsUserToolResultEventParamsType.UserToolResult,
+            Content =
+            [
+                new BetaManagedAgentsTextBlock()
+                {
+                    Text = "Where is my order #1234?",
+                    Type = BetaManagedAgentsTextBlockType.Text,
+                },
+            ],
+            IsError = true,
+        };
+        value.Validate();
+    }
+
+    [Fact]
+    public void UserMessageSerializationRoundtripWorks()
+    {
+        BetaManagedAgentsEventParams value = new BetaManagedAgentsUserMessageEventParams()
+        {
+            Content =
+            [
+                new BetaManagedAgentsTextBlock()
+                {
+                    Text = "Where is my order #1234?",
+                    Type = BetaManagedAgentsTextBlockType.Text,
+                },
+            ],
+            Type = BetaManagedAgentsUserMessageEventParamsType.UserMessage,
+        };
+        string element = JsonSerializer.Serialize(value, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<BetaManagedAgentsEventParams>(
+            element,
+            ModelBase.SerializerOptions
+        );
+
+        Assert.Equal(value, deserialized);
+    }
+
+    [Fact]
+    public void UserInterruptSerializationRoundtripWorks()
+    {
+        BetaManagedAgentsEventParams value = new BetaManagedAgentsUserInterruptEventParams()
+        {
+            Type = BetaManagedAgentsUserInterruptEventParamsType.UserInterrupt,
+            SessionThreadID = "session_thread_id",
+        };
+        string element = JsonSerializer.Serialize(value, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<BetaManagedAgentsEventParams>(
+            element,
+            ModelBase.SerializerOptions
+        );
+
+        Assert.Equal(value, deserialized);
+    }
+
+    [Fact]
+    public void UserToolConfirmationSerializationRoundtripWorks()
+    {
+        BetaManagedAgentsEventParams value = new BetaManagedAgentsUserToolConfirmationEventParams()
+        {
+            Result = BetaManagedAgentsUserToolConfirmationEventParamsResult.Allow,
+            ToolUseID = "x",
+            Type = BetaManagedAgentsUserToolConfirmationEventParamsType.UserToolConfirmation,
+            DenyMessage = "deny_message",
+        };
+        string element = JsonSerializer.Serialize(value, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<BetaManagedAgentsEventParams>(
+            element,
+            ModelBase.SerializerOptions
+        );
+
+        Assert.Equal(value, deserialized);
+    }
+
+    [Fact]
+    public void UserCustomToolResultSerializationRoundtripWorks()
+    {
+        BetaManagedAgentsEventParams value = new BetaManagedAgentsUserCustomToolResultEventParams()
+        {
+            CustomToolUseID = "x",
+            Type = BetaManagedAgentsUserCustomToolResultEventParamsType.UserCustomToolResult,
+            Content =
+            [
+                new BetaManagedAgentsTextBlock()
+                {
+                    Text = "Where is my order #1234?",
+                    Type = BetaManagedAgentsTextBlockType.Text,
+                },
+            ],
+            IsError = true,
+        };
+        string element = JsonSerializer.Serialize(value, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<BetaManagedAgentsEventParams>(
+            element,
+            ModelBase.SerializerOptions
+        );
+
+        Assert.Equal(value, deserialized);
+    }
+
+    [Fact]
+    public void UserDefineOutcomeSerializationRoundtripWorks()
+    {
+        BetaManagedAgentsEventParams value = new BetaManagedAgentsUserDefineOutcomeEventParams()
+        {
+            Description = "Produce a 2-page summary as summary.md",
+            Rubric = new BetaManagedAgentsTextRubricParams()
+            {
+                Content = "Must cover all five sections; cite sources inline.",
+                Type = BetaManagedAgentsTextRubricParamsType.Text,
+            },
+            Type = BetaManagedAgentsUserDefineOutcomeEventParamsType.UserDefineOutcome,
+            MaxIterations = 3,
+        };
+        string element = JsonSerializer.Serialize(value, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<BetaManagedAgentsEventParams>(
+            element,
+            ModelBase.SerializerOptions
+        );
+
+        Assert.Equal(value, deserialized);
+    }
+
+    [Fact]
+    public void UserToolResultSerializationRoundtripWorks()
+    {
+        BetaManagedAgentsEventParams value = new BetaManagedAgentsUserToolResultEventParams()
+        {
+            ToolUseID = "x",
+            Type = BetaManagedAgentsUserToolResultEventParamsType.UserToolResult,
+            Content =
+            [
+                new BetaManagedAgentsTextBlock()
+                {
+                    Text = "Where is my order #1234?",
+                    Type = BetaManagedAgentsTextBlockType.Text,
+                },
+            ],
+            IsError = true,
+        };
+        string element = JsonSerializer.Serialize(value, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<BetaManagedAgentsEventParams>(
+            element,
+            ModelBase.SerializerOptions
+        );
+
+        Assert.Equal(value, deserialized);
+    }
+}

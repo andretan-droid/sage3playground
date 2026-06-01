@@ -1,0 +1,156 @@
+using System.Text.Json;
+using Anthropic.Core;
+using Anthropic.Models.Beta.Messages;
+
+namespace Anthropic.Tests.Models.Beta.Messages;
+
+public class BetaCompactionBlockParamTest : TestBase
+{
+    [Fact]
+    public void FieldRoundtrip_Works()
+    {
+        var model = new BetaCompactionBlockParam
+        {
+            CacheControl = new() { Ttl = Ttl.Ttl5m },
+            Content = "content",
+            EncryptedContent = "encrypted_content",
+        };
+
+        JsonElement expectedType = JsonSerializer.SerializeToElement("compaction");
+        BetaCacheControlEphemeral expectedCacheControl = new() { Ttl = Ttl.Ttl5m };
+        string expectedContent = "content";
+        string expectedEncryptedContent = "encrypted_content";
+
+        Assert.True(JsonElement.DeepEquals(expectedType, model.Type));
+        Assert.Equal(expectedCacheControl, model.CacheControl);
+        Assert.Equal(expectedContent, model.Content);
+        Assert.Equal(expectedEncryptedContent, model.EncryptedContent);
+    }
+
+    [Fact]
+    public void SerializationRoundtrip_Works()
+    {
+        var model = new BetaCompactionBlockParam
+        {
+            CacheControl = new() { Ttl = Ttl.Ttl5m },
+            Content = "content",
+            EncryptedContent = "encrypted_content",
+        };
+
+        string json = JsonSerializer.Serialize(model, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<BetaCompactionBlockParam>(
+            json,
+            ModelBase.SerializerOptions
+        );
+
+        Assert.Equal(model, deserialized);
+    }
+
+    [Fact]
+    public void FieldRoundtripThroughSerialization_Works()
+    {
+        var model = new BetaCompactionBlockParam
+        {
+            CacheControl = new() { Ttl = Ttl.Ttl5m },
+            Content = "content",
+            EncryptedContent = "encrypted_content",
+        };
+
+        string element = JsonSerializer.Serialize(model, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<BetaCompactionBlockParam>(
+            element,
+            ModelBase.SerializerOptions
+        );
+        Assert.NotNull(deserialized);
+
+        JsonElement expectedType = JsonSerializer.SerializeToElement("compaction");
+        BetaCacheControlEphemeral expectedCacheControl = new() { Ttl = Ttl.Ttl5m };
+        string expectedContent = "content";
+        string expectedEncryptedContent = "encrypted_content";
+
+        Assert.True(JsonElement.DeepEquals(expectedType, deserialized.Type));
+        Assert.Equal(expectedCacheControl, deserialized.CacheControl);
+        Assert.Equal(expectedContent, deserialized.Content);
+        Assert.Equal(expectedEncryptedContent, deserialized.EncryptedContent);
+    }
+
+    [Fact]
+    public void Validation_Works()
+    {
+        var model = new BetaCompactionBlockParam
+        {
+            CacheControl = new() { Ttl = Ttl.Ttl5m },
+            Content = "content",
+            EncryptedContent = "encrypted_content",
+        };
+
+        model.Validate();
+    }
+
+    [Fact]
+    public void OptionalNullablePropertiesUnsetAreNotSet_Works()
+    {
+        var model = new BetaCompactionBlockParam { };
+
+        Assert.Null(model.CacheControl);
+        Assert.False(model.RawData.ContainsKey("cache_control"));
+        Assert.Null(model.Content);
+        Assert.False(model.RawData.ContainsKey("content"));
+        Assert.Null(model.EncryptedContent);
+        Assert.False(model.RawData.ContainsKey("encrypted_content"));
+    }
+
+    [Fact]
+    public void OptionalNullablePropertiesUnsetValidation_Works()
+    {
+        var model = new BetaCompactionBlockParam { };
+
+        model.Validate();
+    }
+
+    [Fact]
+    public void OptionalNullablePropertiesSetToNullAreSetToNull_Works()
+    {
+        var model = new BetaCompactionBlockParam
+        {
+            CacheControl = null,
+            Content = null,
+            EncryptedContent = null,
+        };
+
+        Assert.Null(model.CacheControl);
+        Assert.True(model.RawData.ContainsKey("cache_control"));
+        Assert.Null(model.Content);
+        Assert.True(model.RawData.ContainsKey("content"));
+        Assert.Null(model.EncryptedContent);
+        Assert.True(model.RawData.ContainsKey("encrypted_content"));
+    }
+
+    [Fact]
+    public void OptionalNullablePropertiesSetToNullValidation_Works()
+    {
+        var model = new BetaCompactionBlockParam
+        {
+            CacheControl = null,
+            Content = null,
+            EncryptedContent = null,
+        };
+
+        model.Validate();
+    }
+
+    [Fact]
+    public void CopyConstructor_Works()
+    {
+        var model = new BetaCompactionBlockParam
+        {
+            CacheControl = new() { Ttl = Ttl.Ttl5m },
+            Content = "content",
+            EncryptedContent = "encrypted_content",
+        };
+
+        BetaCompactionBlockParam copied = new(model);
+
+        Assert.Equal(model, copied);
+    }
+}

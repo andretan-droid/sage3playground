@@ -1,0 +1,45 @@
+module Anthropic
+  module Models
+    type effort_capability =
+      {
+        high: Anthropic::CapabilitySupport,
+        low: Anthropic::CapabilitySupport,
+        max: Anthropic::CapabilitySupport,
+        medium: Anthropic::CapabilitySupport,
+        supported: bool,
+        xhigh: Anthropic::CapabilitySupport?
+      }
+
+    class EffortCapability < Anthropic::Internal::Type::BaseModel
+      attr_accessor high: Anthropic::CapabilitySupport
+
+      attr_accessor low: Anthropic::CapabilitySupport
+
+      attr_accessor max: Anthropic::CapabilitySupport
+
+      attr_accessor medium: Anthropic::CapabilitySupport
+
+      attr_accessor supported: bool
+
+      attr_accessor xhigh: Anthropic::CapabilitySupport?
+
+      def initialize: (
+        high: Anthropic::CapabilitySupport,
+        low: Anthropic::CapabilitySupport,
+        max: Anthropic::CapabilitySupport,
+        medium: Anthropic::CapabilitySupport,
+        supported: bool,
+        xhigh: Anthropic::CapabilitySupport?
+      ) -> void
+
+      def to_hash: -> {
+        high: Anthropic::CapabilitySupport,
+        low: Anthropic::CapabilitySupport,
+        max: Anthropic::CapabilitySupport,
+        medium: Anthropic::CapabilitySupport,
+        supported: bool,
+        xhigh: Anthropic::CapabilitySupport?
+      }
+    end
+  end
+end

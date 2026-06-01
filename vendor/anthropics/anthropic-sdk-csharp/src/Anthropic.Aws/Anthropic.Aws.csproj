@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Anthropic.Aws</PackageId>
+    <VersionPrefix>0.4.0</VersionPrefix>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Anthropic\Anthropic.csproj"/>
+
+    <PackageReference Include="AWSSDK.Core" Version="4.0.3.3"/>
+    <!--
+      Required at runtime for the default AWS credential chain to resolve SSO-backed
+      profiles (DefaultAWSCredentialsIdentityResolver / CredentialProfileStoreChain).
+    -->
+    <PackageReference Include="AWSSDK.SSO" Version="4.0.2.5"/>
+    <PackageReference Include="AWSSDK.SSOOIDC" Version="4.0.3.6"/>
+    <PackageReference Include="Microsoft.Bcl.Memory" Version="10.0.4"/>
+
+    <None Include="..\logo.png" Pack="true" PackagePath="\"/>
+    <Compile Include="..\Anthropic\Shims.cs"/>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Collections.Immutable" Version="8.0.0"/>
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3"/>
+  </ItemGroup>
+
+</Project>

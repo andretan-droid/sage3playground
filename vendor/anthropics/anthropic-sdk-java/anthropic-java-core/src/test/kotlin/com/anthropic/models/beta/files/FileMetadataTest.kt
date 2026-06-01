@@ -1,0 +1,58 @@
+// File generated from our OpenAPI spec by Stainless.
+
+package com.anthropic.models.beta.files
+
+import com.anthropic.core.jsonMapper
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
+import java.time.OffsetDateTime
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
+
+internal class FileMetadataTest {
+
+    @Test
+    fun create() {
+        val fileMetadata =
+            FileMetadata.builder()
+                .id("file_011CNha8iCJcU1wXNR6q4V8w")
+                .createdAt(OffsetDateTime.parse("2025-04-15T18:37:24.100435Z"))
+                .filename("document.pdf")
+                .mimeType("application/pdf")
+                .sizeBytes(102400L)
+                .downloadable(false)
+                .scope(BetaFileScope.builder().id("id").build())
+                .build()
+
+        assertThat(fileMetadata.id()).isEqualTo("file_011CNha8iCJcU1wXNR6q4V8w")
+        assertThat(fileMetadata.createdAt())
+            .isEqualTo(OffsetDateTime.parse("2025-04-15T18:37:24.100435Z"))
+        assertThat(fileMetadata.filename()).isEqualTo("document.pdf")
+        assertThat(fileMetadata.mimeType()).isEqualTo("application/pdf")
+        assertThat(fileMetadata.sizeBytes()).isEqualTo(102400L)
+        assertThat(fileMetadata.downloadable()).contains(false)
+        assertThat(fileMetadata.scope()).contains(BetaFileScope.builder().id("id").build())
+    }
+
+    @Test
+    fun roundtrip() {
+        val jsonMapper = jsonMapper()
+        val fileMetadata =
+            FileMetadata.builder()
+                .id("file_011CNha8iCJcU1wXNR6q4V8w")
+                .createdAt(OffsetDateTime.parse("2025-04-15T18:37:24.100435Z"))
+                .filename("document.pdf")
+                .mimeType("application/pdf")
+                .sizeBytes(102400L)
+                .downloadable(false)
+                .scope(BetaFileScope.builder().id("id").build())
+                .build()
+
+        val roundtrippedFileMetadata =
+            jsonMapper.readValue(
+                jsonMapper.writeValueAsString(fileMetadata),
+                jacksonTypeRef<FileMetadata>(),
+            )
+
+        assertThat(roundtrippedFileMetadata).isEqualTo(fileMetadata)
+    }
+}

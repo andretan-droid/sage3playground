@@ -1,0 +1,155 @@
+using System.Text.Json;
+using Anthropic.Core;
+using Anthropic.Exceptions;
+using Anthropic.Models.Beta.Messages;
+
+namespace Anthropic.Tests.Models.Beta.Messages;
+
+public class BetaBashCodeExecutionToolResultErrorParamTest : TestBase
+{
+    [Fact]
+    public void FieldRoundtrip_Works()
+    {
+        var model = new BetaBashCodeExecutionToolResultErrorParam
+        {
+            ErrorCode = BetaBashCodeExecutionToolResultErrorParamErrorCode.InvalidToolInput,
+        };
+
+        ApiEnum<string, BetaBashCodeExecutionToolResultErrorParamErrorCode> expectedErrorCode =
+            BetaBashCodeExecutionToolResultErrorParamErrorCode.InvalidToolInput;
+        JsonElement expectedType = JsonSerializer.SerializeToElement(
+            "bash_code_execution_tool_result_error"
+        );
+
+        Assert.Equal(expectedErrorCode, model.ErrorCode);
+        Assert.True(JsonElement.DeepEquals(expectedType, model.Type));
+    }
+
+    [Fact]
+    public void SerializationRoundtrip_Works()
+    {
+        var model = new BetaBashCodeExecutionToolResultErrorParam
+        {
+            ErrorCode = BetaBashCodeExecutionToolResultErrorParamErrorCode.InvalidToolInput,
+        };
+
+        string json = JsonSerializer.Serialize(model, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<BetaBashCodeExecutionToolResultErrorParam>(
+            json,
+            ModelBase.SerializerOptions
+        );
+
+        Assert.Equal(model, deserialized);
+    }
+
+    [Fact]
+    public void FieldRoundtripThroughSerialization_Works()
+    {
+        var model = new BetaBashCodeExecutionToolResultErrorParam
+        {
+            ErrorCode = BetaBashCodeExecutionToolResultErrorParamErrorCode.InvalidToolInput,
+        };
+
+        string element = JsonSerializer.Serialize(model, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<BetaBashCodeExecutionToolResultErrorParam>(
+            element,
+            ModelBase.SerializerOptions
+        );
+        Assert.NotNull(deserialized);
+
+        ApiEnum<string, BetaBashCodeExecutionToolResultErrorParamErrorCode> expectedErrorCode =
+            BetaBashCodeExecutionToolResultErrorParamErrorCode.InvalidToolInput;
+        JsonElement expectedType = JsonSerializer.SerializeToElement(
+            "bash_code_execution_tool_result_error"
+        );
+
+        Assert.Equal(expectedErrorCode, deserialized.ErrorCode);
+        Assert.True(JsonElement.DeepEquals(expectedType, deserialized.Type));
+    }
+
+    [Fact]
+    public void Validation_Works()
+    {
+        var model = new BetaBashCodeExecutionToolResultErrorParam
+        {
+            ErrorCode = BetaBashCodeExecutionToolResultErrorParamErrorCode.InvalidToolInput,
+        };
+
+        model.Validate();
+    }
+
+    [Fact]
+    public void CopyConstructor_Works()
+    {
+        var model = new BetaBashCodeExecutionToolResultErrorParam
+        {
+            ErrorCode = BetaBashCodeExecutionToolResultErrorParamErrorCode.InvalidToolInput,
+        };
+
+        BetaBashCodeExecutionToolResultErrorParam copied = new(model);
+
+        Assert.Equal(model, copied);
+    }
+}
+
+public class BetaBashCodeExecutionToolResultErrorParamErrorCodeTest : TestBase
+{
+    [Theory]
+    [InlineData(BetaBashCodeExecutionToolResultErrorParamErrorCode.InvalidToolInput)]
+    [InlineData(BetaBashCodeExecutionToolResultErrorParamErrorCode.Unavailable)]
+    [InlineData(BetaBashCodeExecutionToolResultErrorParamErrorCode.TooManyRequests)]
+    [InlineData(BetaBashCodeExecutionToolResultErrorParamErrorCode.ExecutionTimeExceeded)]
+    [InlineData(BetaBashCodeExecutionToolResultErrorParamErrorCode.OutputFileTooLarge)]
+    public void Validation_Works(BetaBashCodeExecutionToolResultErrorParamErrorCode rawValue)
+    {
+        // force implicit conversion because Theory can't do that for us
+        ApiEnum<string, BetaBashCodeExecutionToolResultErrorParamErrorCode> value = rawValue;
+        value.Validate();
+    }
+
+    [Fact]
+    public void InvalidEnumValidationThrows_Works()
+    {
+        var value = JsonSerializer.Deserialize<
+            ApiEnum<string, BetaBashCodeExecutionToolResultErrorParamErrorCode>
+        >(JsonSerializer.SerializeToElement("invalid value"), ModelBase.SerializerOptions);
+
+        Assert.NotNull(value);
+        Assert.Throws<AnthropicInvalidDataException>(() => value.Validate());
+    }
+
+    [Theory]
+    [InlineData(BetaBashCodeExecutionToolResultErrorParamErrorCode.InvalidToolInput)]
+    [InlineData(BetaBashCodeExecutionToolResultErrorParamErrorCode.Unavailable)]
+    [InlineData(BetaBashCodeExecutionToolResultErrorParamErrorCode.TooManyRequests)]
+    [InlineData(BetaBashCodeExecutionToolResultErrorParamErrorCode.ExecutionTimeExceeded)]
+    [InlineData(BetaBashCodeExecutionToolResultErrorParamErrorCode.OutputFileTooLarge)]
+    public void SerializationRoundtrip_Works(
+        BetaBashCodeExecutionToolResultErrorParamErrorCode rawValue
+    )
+    {
+        // force implicit conversion because Theory can't do that for us
+        ApiEnum<string, BetaBashCodeExecutionToolResultErrorParamErrorCode> value = rawValue;
+
+        string json = JsonSerializer.Serialize(value, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<
+            ApiEnum<string, BetaBashCodeExecutionToolResultErrorParamErrorCode>
+        >(json, ModelBase.SerializerOptions);
+
+        Assert.Equal(value, deserialized);
+    }
+
+    [Fact]
+    public void InvalidEnumSerializationRoundtrip_Works()
+    {
+        var value = JsonSerializer.Deserialize<
+            ApiEnum<string, BetaBashCodeExecutionToolResultErrorParamErrorCode>
+        >(JsonSerializer.SerializeToElement("invalid value"), ModelBase.SerializerOptions);
+        string json = JsonSerializer.Serialize(value, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<
+            ApiEnum<string, BetaBashCodeExecutionToolResultErrorParamErrorCode>
+        >(json, ModelBase.SerializerOptions);
+
+        Assert.Equal(value, deserialized);
+    }
+}

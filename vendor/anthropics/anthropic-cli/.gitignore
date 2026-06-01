@@ -1,0 +1,6 @@
+.prism.log
+.stdy.log
+dist/
+/ant
+/bin/
+*.exe

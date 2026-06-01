@@ -1,0 +1,280 @@
+using System;
+using System.Text.Json;
+using Anthropic.Core;
+using Anthropic.Exceptions;
+using Anthropic.Models.Beta.Messages.Batches;
+
+namespace Anthropic.Tests.Models.Beta.Messages.Batches;
+
+public class BetaMessageBatchTest : TestBase
+{
+    [Fact]
+    public void FieldRoundtrip_Works()
+    {
+        var model = new BetaMessageBatch
+        {
+            ID = "msgbatch_013Zva2CMHLNnXjNJJKqJ2EF",
+            ArchivedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            CancelInitiatedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            CreatedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            EndedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            ExpiresAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            ProcessingStatus = ProcessingStatus.InProgress,
+            RequestCounts = new()
+            {
+                Canceled = 10,
+                Errored = 30,
+                Expired = 10,
+                Processing = 100,
+                Succeeded = 50,
+            },
+            ResultsUrl =
+                "https://api.anthropic.com/v1/messages/batches/msgbatch_013Zva2CMHLNnXjNJJKqJ2EF/results",
+        };
+
+        string expectedID = "msgbatch_013Zva2CMHLNnXjNJJKqJ2EF";
+        DateTimeOffset expectedArchivedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z");
+        DateTimeOffset expectedCancelInitiatedAt = DateTimeOffset.Parse(
+            "2024-08-20T18:37:24.100435Z"
+        );
+        DateTimeOffset expectedCreatedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z");
+        DateTimeOffset expectedEndedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z");
+        DateTimeOffset expectedExpiresAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z");
+        ApiEnum<string, ProcessingStatus> expectedProcessingStatus = ProcessingStatus.InProgress;
+        BetaMessageBatchRequestCounts expectedRequestCounts = new()
+        {
+            Canceled = 10,
+            Errored = 30,
+            Expired = 10,
+            Processing = 100,
+            Succeeded = 50,
+        };
+        string expectedResultsUrl =
+            "https://api.anthropic.com/v1/messages/batches/msgbatch_013Zva2CMHLNnXjNJJKqJ2EF/results";
+        JsonElement expectedType = JsonSerializer.SerializeToElement("message_batch");
+
+        Assert.Equal(expectedID, model.ID);
+        Assert.Equal(expectedArchivedAt, model.ArchivedAt);
+        Assert.Equal(expectedCancelInitiatedAt, model.CancelInitiatedAt);
+        Assert.Equal(expectedCreatedAt, model.CreatedAt);
+        Assert.Equal(expectedEndedAt, model.EndedAt);
+        Assert.Equal(expectedExpiresAt, model.ExpiresAt);
+        Assert.Equal(expectedProcessingStatus, model.ProcessingStatus);
+        Assert.Equal(expectedRequestCounts, model.RequestCounts);
+        Assert.Equal(expectedResultsUrl, model.ResultsUrl);
+        Assert.True(JsonElement.DeepEquals(expectedType, model.Type));
+    }
+
+    [Fact]
+    public void SerializationRoundtrip_Works()
+    {
+        var model = new BetaMessageBatch
+        {
+            ID = "msgbatch_013Zva2CMHLNnXjNJJKqJ2EF",
+            ArchivedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            CancelInitiatedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            CreatedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            EndedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            ExpiresAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            ProcessingStatus = ProcessingStatus.InProgress,
+            RequestCounts = new()
+            {
+                Canceled = 10,
+                Errored = 30,
+                Expired = 10,
+                Processing = 100,
+                Succeeded = 50,
+            },
+            ResultsUrl =
+                "https://api.anthropic.com/v1/messages/batches/msgbatch_013Zva2CMHLNnXjNJJKqJ2EF/results",
+        };
+
+        string json = JsonSerializer.Serialize(model, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<BetaMessageBatch>(
+            json,
+            ModelBase.SerializerOptions
+        );
+
+        Assert.Equal(model, deserialized);
+    }
+
+    [Fact]
+    public void FieldRoundtripThroughSerialization_Works()
+    {
+        var model = new BetaMessageBatch
+        {
+            ID = "msgbatch_013Zva2CMHLNnXjNJJKqJ2EF",
+            ArchivedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            CancelInitiatedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            CreatedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            EndedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            ExpiresAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            ProcessingStatus = ProcessingStatus.InProgress,
+            RequestCounts = new()
+            {
+                Canceled = 10,
+                Errored = 30,
+                Expired = 10,
+                Processing = 100,
+                Succeeded = 50,
+            },
+            ResultsUrl =
+                "https://api.anthropic.com/v1/messages/batches/msgbatch_013Zva2CMHLNnXjNJJKqJ2EF/results",
+        };
+
+        string element = JsonSerializer.Serialize(model, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<BetaMessageBatch>(
+            element,
+            ModelBase.SerializerOptions
+        );
+        Assert.NotNull(deserialized);
+
+        string expectedID = "msgbatch_013Zva2CMHLNnXjNJJKqJ2EF";
+        DateTimeOffset expectedArchivedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z");
+        DateTimeOffset expectedCancelInitiatedAt = DateTimeOffset.Parse(
+            "2024-08-20T18:37:24.100435Z"
+        );
+        DateTimeOffset expectedCreatedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z");
+        DateTimeOffset expectedEndedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z");
+        DateTimeOffset expectedExpiresAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z");
+        ApiEnum<string, ProcessingStatus> expectedProcessingStatus = ProcessingStatus.InProgress;
+        BetaMessageBatchRequestCounts expectedRequestCounts = new()
+        {
+            Canceled = 10,
+            Errored = 30,
+            Expired = 10,
+            Processing = 100,
+            Succeeded = 50,
+        };
+        string expectedResultsUrl =
+            "https://api.anthropic.com/v1/messages/batches/msgbatch_013Zva2CMHLNnXjNJJKqJ2EF/results";
+        JsonElement expectedType = JsonSerializer.SerializeToElement("message_batch");
+
+        Assert.Equal(expectedID, deserialized.ID);
+        Assert.Equal(expectedArchivedAt, deserialized.ArchivedAt);
+        Assert.Equal(expectedCancelInitiatedAt, deserialized.CancelInitiatedAt);
+        Assert.Equal(expectedCreatedAt, deserialized.CreatedAt);
+        Assert.Equal(expectedEndedAt, deserialized.EndedAt);
+        Assert.Equal(expectedExpiresAt, deserialized.ExpiresAt);
+        Assert.Equal(expectedProcessingStatus, deserialized.ProcessingStatus);
+        Assert.Equal(expectedRequestCounts, deserialized.RequestCounts);
+        Assert.Equal(expectedResultsUrl, deserialized.ResultsUrl);
+        Assert.True(JsonElement.DeepEquals(expectedType, deserialized.Type));
+    }
+
+    [Fact]
+    public void Validation_Works()
+    {
+        var model = new BetaMessageBatch
+        {
+            ID = "msgbatch_013Zva2CMHLNnXjNJJKqJ2EF",
+            ArchivedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            CancelInitiatedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            CreatedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            EndedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            ExpiresAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            ProcessingStatus = ProcessingStatus.InProgress,
+            RequestCounts = new()
+            {
+                Canceled = 10,
+                Errored = 30,
+                Expired = 10,
+                Processing = 100,
+                Succeeded = 50,
+            },
+            ResultsUrl =
+                "https://api.anthropic.com/v1/messages/batches/msgbatch_013Zva2CMHLNnXjNJJKqJ2EF/results",
+        };
+
+        model.Validate();
+    }
+
+    [Fact]
+    public void CopyConstructor_Works()
+    {
+        var model = new BetaMessageBatch
+        {
+            ID = "msgbatch_013Zva2CMHLNnXjNJJKqJ2EF",
+            ArchivedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            CancelInitiatedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            CreatedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            EndedAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            ExpiresAt = DateTimeOffset.Parse("2024-08-20T18:37:24.100435Z"),
+            ProcessingStatus = ProcessingStatus.InProgress,
+            RequestCounts = new()
+            {
+                Canceled = 10,
+                Errored = 30,
+                Expired = 10,
+                Processing = 100,
+                Succeeded = 50,
+            },
+            ResultsUrl =
+                "https://api.anthropic.com/v1/messages/batches/msgbatch_013Zva2CMHLNnXjNJJKqJ2EF/results",
+        };
+
+        BetaMessageBatch copied = new(model);
+
+        Assert.Equal(model, copied);
+    }
+}
+
+public class ProcessingStatusTest : TestBase
+{
+    [Theory]
+    [InlineData(ProcessingStatus.InProgress)]
+    [InlineData(ProcessingStatus.Canceling)]
+    [InlineData(ProcessingStatus.Ended)]
+    public void Validation_Works(ProcessingStatus rawValue)
+    {
+        // force implicit conversion because Theory can't do that for us
+        ApiEnum<string, ProcessingStatus> value = rawValue;
+        value.Validate();
+    }
+
+    [Fact]
+    public void InvalidEnumValidationThrows_Works()
+    {
+        var value = JsonSerializer.Deserialize<ApiEnum<string, ProcessingStatus>>(
+            JsonSerializer.SerializeToElement("invalid value"),
+            ModelBase.SerializerOptions
+        );
+
+        Assert.NotNull(value);
+        Assert.Throws<AnthropicInvalidDataException>(() => value.Validate());
+    }
+
+    [Theory]
+    [InlineData(ProcessingStatus.InProgress)]
+    [InlineData(ProcessingStatus.Canceling)]
+    [InlineData(ProcessingStatus.Ended)]
+    public void SerializationRoundtrip_Works(ProcessingStatus rawValue)
+    {
+        // force implicit conversion because Theory can't do that for us
+        ApiEnum<string, ProcessingStatus> value = rawValue;
+
+        string json = JsonSerializer.Serialize(value, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<ApiEnum<string, ProcessingStatus>>(
+            json,
+            ModelBase.SerializerOptions
+        );
+
+        Assert.Equal(value, deserialized);
+    }
+
+    [Fact]
+    public void InvalidEnumSerializationRoundtrip_Works()
+    {
+        var value = JsonSerializer.Deserialize<ApiEnum<string, ProcessingStatus>>(
+            JsonSerializer.SerializeToElement("invalid value"),
+            ModelBase.SerializerOptions
+        );
+        string json = JsonSerializer.Serialize(value, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<ApiEnum<string, ProcessingStatus>>(
+            json,
+            ModelBase.SerializerOptions
+        );
+
+        Assert.Equal(value, deserialized);
+    }
+}

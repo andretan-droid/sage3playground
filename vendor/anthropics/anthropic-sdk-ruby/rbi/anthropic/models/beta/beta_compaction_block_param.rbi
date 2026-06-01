@@ -1,0 +1,83 @@
+# typed: strong
+
+module Anthropic
+  module Models
+    BetaCompactionBlockParam = Beta::BetaCompactionBlockParam
+
+    module Beta
+      class BetaCompactionBlockParam < Anthropic::Internal::Type::BaseModel
+        OrHash =
+          T.type_alias do
+            T.any(
+              Anthropic::Beta::BetaCompactionBlockParam,
+              Anthropic::Internal::AnyHash
+            )
+          end
+
+        sig { returns(Symbol) }
+        attr_accessor :type
+
+        # Create a cache control breakpoint at this content block.
+        sig { returns(T.nilable(Anthropic::Beta::BetaCacheControlEphemeral)) }
+        attr_reader :cache_control
+
+        sig do
+          params(
+            cache_control:
+              T.nilable(Anthropic::Beta::BetaCacheControlEphemeral::OrHash)
+          ).void
+        end
+        attr_writer :cache_control
+
+        # Summary of previously compacted content, or null if compaction failed
+        sig { returns(T.nilable(String)) }
+        attr_accessor :content
+
+        # Opaque metadata from prior compaction, to be round-tripped verbatim
+        sig { returns(T.nilable(String)) }
+        attr_accessor :encrypted_content
+
+        # A compaction block containing summary of previous context.
+        #
+        # Users should round-trip these blocks from responses to subsequent requests to
+        # maintain context across compaction boundaries.
+        #
+        # When content is None, the block represents a failed compaction. The server
+        # treats these as no-ops. Empty string content is not allowed.
+        sig do
+          params(
+            cache_control:
+              T.nilable(Anthropic::Beta::BetaCacheControlEphemeral::OrHash),
+            content: T.nilable(String),
+            encrypted_content: T.nilable(String),
+            type: Symbol
+          ).returns(T.attached_class)
+        end
+        def self.new(
+          # Create a cache control breakpoint at this content block.
+          cache_control: nil,
+          # Summary of previously compacted content, or null if compaction failed
+          content: nil,
+          # Opaque metadata from prior compaction, to be round-tripped verbatim
+          encrypted_content: nil,
+          type: :compaction
+        )
+        end
+
+        sig do
+          override.returns(
+            {
+              type: Symbol,
+              cache_control:
+                T.nilable(Anthropic::Beta::BetaCacheControlEphemeral),
+              content: T.nilable(String),
+              encrypted_content: T.nilable(String)
+            }
+          )
+        end
+        def to_hash
+        end
+      end
+    end
+  end
+end

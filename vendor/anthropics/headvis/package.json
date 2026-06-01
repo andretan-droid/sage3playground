@@ -1,0 +1,20 @@
+{
+  "name": "headvis",
+  "version": "0.0.0",
+  "type": "module",
+  "license": "Apache-2.0",
+  "scripts": {
+    "dev": "vite --port 3100",
+    "build": "vite build",
+    "preview": "vite preview --port 3100"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^5.0.0",
+    "svelte": "^5.32.1",
+    "vite": "^6.0.0"
+  },
+  "dependencies": {
+    "d3": "^7.9.0",
+    "plotly.js-dist-min": "^3.0.1"
+  }
+}

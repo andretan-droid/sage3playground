@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Tailscale Connection Hint",
+  "version": "1.0.0",
+  "description": "Shows helpful troubleshooting when .local domains (Tailscale MagicDNS) fail to resolve, with live connectivity monitoring",
+  "author": "nova",
+  "homepage_url": "https://github.com/anthropics/tailscale-hint-extension",
+  "permissions": [
+    "webNavigation",
+    "tabs"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

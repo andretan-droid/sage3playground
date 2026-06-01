@@ -1,0 +1,70 @@
+// File generated from our OpenAPI spec by Stainless.
+
+package com.anthropic.models.messages
+
+import com.anthropic.core.JsonValue
+import com.anthropic.core.jsonMapper
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
+
+internal class ToolUseBlockParamTest {
+
+    @Test
+    fun create() {
+        val toolUseBlockParam =
+            ToolUseBlockParam.builder()
+                .id("id")
+                .input(
+                    ToolUseBlockParam.Input.builder()
+                        .putAdditionalProperty("foo", JsonValue.from("bar"))
+                        .build()
+                )
+                .name("x")
+                .cacheControl(
+                    CacheControlEphemeral.builder().ttl(CacheControlEphemeral.Ttl.TTL_5M).build()
+                )
+                .caller(DirectCaller.builder().build())
+                .build()
+
+        assertThat(toolUseBlockParam.id()).isEqualTo("id")
+        assertThat(toolUseBlockParam.input())
+            .isEqualTo(
+                ToolUseBlockParam.Input.builder()
+                    .putAdditionalProperty("foo", JsonValue.from("bar"))
+                    .build()
+            )
+        assertThat(toolUseBlockParam.name()).isEqualTo("x")
+        assertThat(toolUseBlockParam.cacheControl())
+            .contains(CacheControlEphemeral.builder().ttl(CacheControlEphemeral.Ttl.TTL_5M).build())
+        assertThat(toolUseBlockParam.caller())
+            .contains(ToolUseBlockParam.Caller.ofDirect(DirectCaller.builder().build()))
+    }
+
+    @Test
+    fun roundtrip() {
+        val jsonMapper = jsonMapper()
+        val toolUseBlockParam =
+            ToolUseBlockParam.builder()
+                .id("id")
+                .input(
+                    ToolUseBlockParam.Input.builder()
+                        .putAdditionalProperty("foo", JsonValue.from("bar"))
+                        .build()
+                )
+                .name("x")
+                .cacheControl(
+                    CacheControlEphemeral.builder().ttl(CacheControlEphemeral.Ttl.TTL_5M).build()
+                )
+                .caller(DirectCaller.builder().build())
+                .build()
+
+        val roundtrippedToolUseBlockParam =
+            jsonMapper.readValue(
+                jsonMapper.writeValueAsString(toolUseBlockParam),
+                jacksonTypeRef<ToolUseBlockParam>(),
+            )
+
+        assertThat(roundtrippedToolUseBlockParam).isEqualTo(toolUseBlockParam)
+    }
+}

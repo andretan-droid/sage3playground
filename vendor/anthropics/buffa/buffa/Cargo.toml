@@ -1,0 +1,67 @@
+[package]
+name = "buffa"
+description = "A pure Rust Protocol Buffers implementation with first-class editions support"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+readme = "README.md"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[features]
+default = ["std"]
+std = [
+    "bytes/std",
+    "thiserror/std",
+    "serde?/std",
+    "serde_json?/std",
+    "smol_str?/std",
+    "ecow?/std",
+    "compact_str?/std",
+]
+# `json` and `text` are independently enableable. Both share the
+# `type_registry` module (gated `any(json, text)`) but carry per-format
+# entry types (`JsonAnyEntry` vs `TextAnyEntry`) — no struct-literal `#[cfg]`
+# needed, no `Option<fn>` placeholder fields.
+json = [
+    "dep:serde",
+    "dep:base64",
+    "dep:serde_json",
+    "serde/alloc",
+    "serde/derive",
+    "hashbrown/serde",
+    # Pull in serde support for whichever configurable string types are enabled.
+    "smol_str?/serde",
+    "ecow?/serde",
+    "compact_str?/serde",
+]
+arbitrary = ["dep:arbitrary", "smol_str?/arbitrary", "compact_str?/arbitrary"]
+text = []
+# Configurable `string` field representations. Enabling one of these will let
+# `buffa_build`'s forthcoming `string_type` knob map proto `string` to that
+# type; buffa re-exports the crate so generated code references
+# `::buffa::<crate>::<Type>` and downstream crates do not declare the dependency
+# themselves. `ecow` has no native `arbitrary` impl, so buffa supplies a shim
+# under the `arbitrary` feature.
+smol_str = ["dep:smol_str"]
+ecow = ["dep:ecow"]
+compact_str = ["dep:compact_str"]
+
+[dependencies]
+arbitrary = { workspace = true, optional = true }
+base64 = { workspace = true, optional = true }
+bytes = { workspace = true }
+hashbrown = { workspace = true }
+once_cell = { workspace = true, features = ["alloc"] }
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+thiserror = { workspace = true }
+smol_str = { workspace = true, optional = true }
+ecow = { workspace = true, optional = true }
+compact_str = { workspace = true, optional = true }

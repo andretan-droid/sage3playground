@@ -1,0 +1,171 @@
+using System.Text.Json;
+using Anthropic.Core;
+using Anthropic.Models.Beta.Messages;
+
+namespace Anthropic.Tests.Models.Beta.Messages;
+
+public class BetaWebSearchResultBlockParamTest : TestBase
+{
+    [Fact]
+    public void FieldRoundtrip_Works()
+    {
+        var model = new BetaWebSearchResultBlockParam
+        {
+            EncryptedContent = "encrypted_content",
+            Title = "title",
+            Url = "url",
+            PageAge = "page_age",
+        };
+
+        string expectedEncryptedContent = "encrypted_content";
+        string expectedTitle = "title";
+        JsonElement expectedType = JsonSerializer.SerializeToElement("web_search_result");
+        string expectedUrl = "url";
+        string expectedPageAge = "page_age";
+
+        Assert.Equal(expectedEncryptedContent, model.EncryptedContent);
+        Assert.Equal(expectedTitle, model.Title);
+        Assert.True(JsonElement.DeepEquals(expectedType, model.Type));
+        Assert.Equal(expectedUrl, model.Url);
+        Assert.Equal(expectedPageAge, model.PageAge);
+    }
+
+    [Fact]
+    public void SerializationRoundtrip_Works()
+    {
+        var model = new BetaWebSearchResultBlockParam
+        {
+            EncryptedContent = "encrypted_content",
+            Title = "title",
+            Url = "url",
+            PageAge = "page_age",
+        };
+
+        string json = JsonSerializer.Serialize(model, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<BetaWebSearchResultBlockParam>(
+            json,
+            ModelBase.SerializerOptions
+        );
+
+        Assert.Equal(model, deserialized);
+    }
+
+    [Fact]
+    public void FieldRoundtripThroughSerialization_Works()
+    {
+        var model = new BetaWebSearchResultBlockParam
+        {
+            EncryptedContent = "encrypted_content",
+            Title = "title",
+            Url = "url",
+            PageAge = "page_age",
+        };
+
+        string element = JsonSerializer.Serialize(model, ModelBase.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<BetaWebSearchResultBlockParam>(
+            element,
+            ModelBase.SerializerOptions
+        );
+        Assert.NotNull(deserialized);
+
+        string expectedEncryptedContent = "encrypted_content";
+        string expectedTitle = "title";
+        JsonElement expectedType = JsonSerializer.SerializeToElement("web_search_result");
+        string expectedUrl = "url";
+        string expectedPageAge = "page_age";
+
+        Assert.Equal(expectedEncryptedContent, deserialized.EncryptedContent);
+        Assert.Equal(expectedTitle, deserialized.Title);
+        Assert.True(JsonElement.DeepEquals(expectedType, deserialized.Type));
+        Assert.Equal(expectedUrl, deserialized.Url);
+        Assert.Equal(expectedPageAge, deserialized.PageAge);
+    }
+
+    [Fact]
+    public void Validation_Works()
+    {
+        var model = new BetaWebSearchResultBlockParam
+        {
+            EncryptedContent = "encrypted_content",
+            Title = "title",
+            Url = "url",
+            PageAge = "page_age",
+        };
+
+        model.Validate();
+    }
+
+    [Fact]
+    public void OptionalNullablePropertiesUnsetAreNotSet_Works()
+    {
+        var model = new BetaWebSearchResultBlockParam
+        {
+            EncryptedContent = "encrypted_content",
+            Title = "title",
+            Url = "url",
+        };
+
+        Assert.Null(model.PageAge);
+        Assert.False(model.RawData.ContainsKey("page_age"));
+    }
+
+    [Fact]
+    public void OptionalNullablePropertiesUnsetValidation_Works()
+    {
+        var model = new BetaWebSearchResultBlockParam
+        {
+            EncryptedContent = "encrypted_content",
+            Title = "title",
+            Url = "url",
+        };
+
+        model.Validate();
+    }
+
+    [Fact]
+    public void OptionalNullablePropertiesSetToNullAreSetToNull_Works()
+    {
+        var model = new BetaWebSearchResultBlockParam
+        {
+            EncryptedContent = "encrypted_content",
+            Title = "title",
+            Url = "url",
+
+            PageAge = null,
+        };
+
+        Assert.Null(model.PageAge);
+        Assert.True(model.RawData.ContainsKey("page_age"));
+    }
+
+    [Fact]
+    public void OptionalNullablePropertiesSetToNullValidation_Works()
+    {
+        var model = new BetaWebSearchResultBlockParam
+        {
+            EncryptedContent = "encrypted_content",
+            Title = "title",
+            Url = "url",
+
+            PageAge = null,
+        };
+
+        model.Validate();
+    }
+
+    [Fact]
+    public void CopyConstructor_Works()
+    {
+        var model = new BetaWebSearchResultBlockParam
+        {
+            EncryptedContent = "encrypted_content",
+            Title = "title",
+            Url = "url",
+            PageAge = "page_age",
+        };
+
+        BetaWebSearchResultBlockParam copied = new(model);
+
+        Assert.Equal(model, copied);
+    }
+}

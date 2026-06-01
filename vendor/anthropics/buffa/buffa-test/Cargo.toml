@@ -1,0 +1,44 @@
+[package]
+name = "buffa-test"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[features]
+arbitrary = ["dep:arbitrary", "buffa/arbitrary"]
+
+[dependencies]
+arbitrary = { workspace = true, optional = true }
+buffa = { workspace = true, features = [
+    "std",
+    "json",
+    "text",
+    "smol_str",
+    "ecow",
+    "compact_str",
+] }
+# `reflect`+`json` so the codegen-emitted `impl Reflectable` and the
+# embedded descriptor pool resolve. `json` because `basic.proto` is also
+# generated with `generate_text(true)` and the pool decodes the WKT
+# descriptors that need it.
+buffa-descriptor = { workspace = true, features = [
+    "reflect",
+    "json",
+    "std",
+    # `ReflectElement` impls for the configurable string reprs, so a
+    # `repeated <repr>` field reflects in vtable mode (vtable_string_repr test).
+    "smol_str",
+    "ecow",
+    "compact_str",
+] }
+buffa-types = { workspace = true, features = ["json"] }
+bytes = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+
+[build-dependencies]
+buffa-build = { workspace = true }

@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsTestProject>true</IsTestProject>
+    <IsPackable>false</IsPackable>
+    <OutputType>Exe</OutputType>
+
+    <!-- Run tests on net8.0, which will use the SDK's net8.0 DLL, and on net472, which will use the
+    SDK's netstandard2.0 DLL. -->
+    <TargetFrameworks>net8.0;net472</TargetFrameworks>
+
+    <!-- Disable skipped tests warnings. -->
+    <NoWarn>$(NoWarn),xUnit1004</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageReference Include="Moq" Version="4.20.72" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+    <PackageReference Include="xunit.v3" Version="3.2.1" />
+    <PackageReference Include="xunit.analyzers" Version="1.26.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <ProjectReference Include="..\Anthropic\Anthropic.csproj" />
+    <ProjectReference Include="..\Anthropic.Foundry\Anthropic.Foundry.csproj" />
+    <ProjectReference Include="..\Anthropic.Bedrock\Anthropic.Bedrock.csproj" />
+    <ProjectReference Include="..\Anthropic.Aws\Anthropic.Aws.csproj" />
+    <ProjectReference Include="..\Anthropic.Vertex\Anthropic.Vertex.csproj" />
+    <ProjectReference Include="..\Anthropic.Mcp\Anthropic.Mcp.csproj" />
+    <Using Include="Xunit" />
+  </ItemGroup>
+</Project>

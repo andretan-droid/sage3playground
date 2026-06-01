@@ -1,0 +1,30 @@
+module Anthropic
+  module Models
+    class BetaAdvisorResultBlock = Beta::BetaAdvisorResultBlock
+
+    module Beta
+      type beta_advisor_result_block =
+        { stop_reason: String?, text: String, type: :advisor_result }
+
+      class BetaAdvisorResultBlock < Anthropic::Internal::Type::BaseModel
+        attr_accessor stop_reason: String?
+
+        attr_accessor text: String
+
+        attr_accessor type: :advisor_result
+
+        def initialize: (
+          stop_reason: String?,
+          text: String,
+          ?type: :advisor_result
+        ) -> void
+
+        def to_hash: -> {
+          stop_reason: String?,
+          text: String,
+          type: :advisor_result
+        }
+      end
+    end
+  end
+end

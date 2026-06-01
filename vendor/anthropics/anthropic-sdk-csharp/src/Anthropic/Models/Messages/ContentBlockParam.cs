@@ -1,0 +1,1348 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Anthropic.Core;
+using Anthropic.Exceptions;
+using System = System;
+
+namespace Anthropic.Models.Messages;
+
+/// <summary>
+/// Regular text content.
+/// </summary>
+[JsonConverter(typeof(ContentBlockParamConverter))]
+public record class ContentBlockParam : ModelBase
+{
+    public object? Value { get; } = null;
+
+    JsonElement? _element = null;
+
+    public JsonElement Json
+    {
+        get
+        {
+            return this._element ??= JsonSerializer.SerializeToElement(
+                this.Value,
+                ModelBase.SerializerOptions
+            );
+        }
+    }
+
+    public JsonElement Type
+    {
+        get
+        {
+            return Match(
+                text: (x) => x.Type,
+                image: (x) => x.Type,
+                document: (x) => x.Type,
+                searchResult: (x) => x.Type,
+                thinking: (x) => x.Type,
+                redactedThinking: (x) => x.Type,
+                toolUse: (x) => x.Type,
+                toolResult: (x) => x.Type,
+                serverToolUse: (x) => x.Type,
+                webSearchToolResult: (x) => x.Type,
+                webFetchToolResult: (x) => x.Type,
+                codeExecutionToolResult: (x) => x.Type,
+                bashCodeExecutionToolResult: (x) => x.Type,
+                textEditorCodeExecutionToolResult: (x) => x.Type,
+                toolSearchToolResult: (x) => x.Type,
+                containerUpload: (x) => x.Type,
+                midConversationSystem: (x) => x.Type
+            );
+        }
+    }
+
+    public CacheControlEphemeral? CacheControl
+    {
+        get
+        {
+            return Match<CacheControlEphemeral?>(
+                text: (x) => x.CacheControl,
+                image: (x) => x.CacheControl,
+                document: (x) => x.CacheControl,
+                searchResult: (x) => x.CacheControl,
+                thinking: (_) => null,
+                redactedThinking: (_) => null,
+                toolUse: (x) => x.CacheControl,
+                toolResult: (x) => x.CacheControl,
+                serverToolUse: (x) => x.CacheControl,
+                webSearchToolResult: (x) => x.CacheControl,
+                webFetchToolResult: (x) => x.CacheControl,
+                codeExecutionToolResult: (x) => x.CacheControl,
+                bashCodeExecutionToolResult: (x) => x.CacheControl,
+                textEditorCodeExecutionToolResult: (x) => x.CacheControl,
+                toolSearchToolResult: (x) => x.CacheControl,
+                containerUpload: (x) => x.CacheControl,
+                midConversationSystem: (x) => x.CacheControl
+            );
+        }
+    }
+
+    public string? Title
+    {
+        get
+        {
+            return Match<string?>(
+                text: (_) => null,
+                image: (_) => null,
+                document: (x) => x.Title,
+                searchResult: (x) => x.Title,
+                thinking: (_) => null,
+                redactedThinking: (_) => null,
+                toolUse: (_) => null,
+                toolResult: (_) => null,
+                serverToolUse: (_) => null,
+                webSearchToolResult: (_) => null,
+                webFetchToolResult: (_) => null,
+                codeExecutionToolResult: (_) => null,
+                bashCodeExecutionToolResult: (_) => null,
+                textEditorCodeExecutionToolResult: (_) => null,
+                toolSearchToolResult: (_) => null,
+                containerUpload: (_) => null,
+                midConversationSystem: (_) => null
+            );
+        }
+    }
+
+    public string? ID
+    {
+        get
+        {
+            return Match<string?>(
+                text: (_) => null,
+                image: (_) => null,
+                document: (_) => null,
+                searchResult: (_) => null,
+                thinking: (_) => null,
+                redactedThinking: (_) => null,
+                toolUse: (x) => x.ID,
+                toolResult: (_) => null,
+                serverToolUse: (x) => x.ID,
+                webSearchToolResult: (_) => null,
+                webFetchToolResult: (_) => null,
+                codeExecutionToolResult: (_) => null,
+                bashCodeExecutionToolResult: (_) => null,
+                textEditorCodeExecutionToolResult: (_) => null,
+                toolSearchToolResult: (_) => null,
+                containerUpload: (_) => null,
+                midConversationSystem: (_) => null
+            );
+        }
+    }
+
+    public string? ToolUseID
+    {
+        get
+        {
+            return Match<string?>(
+                text: (_) => null,
+                image: (_) => null,
+                document: (_) => null,
+                searchResult: (_) => null,
+                thinking: (_) => null,
+                redactedThinking: (_) => null,
+                toolUse: (_) => null,
+                toolResult: (x) => x.ToolUseID,
+                serverToolUse: (_) => null,
+                webSearchToolResult: (x) => x.ToolUseID,
+                webFetchToolResult: (x) => x.ToolUseID,
+                codeExecutionToolResult: (x) => x.ToolUseID,
+                bashCodeExecutionToolResult: (x) => x.ToolUseID,
+                textEditorCodeExecutionToolResult: (x) => x.ToolUseID,
+                toolSearchToolResult: (x) => x.ToolUseID,
+                containerUpload: (_) => null,
+                midConversationSystem: (_) => null
+            );
+        }
+    }
+
+    public ContentBlockParam(TextBlockParam value, JsonElement? element = null)
+    {
+        this.Value = value;
+        this._element = element;
+    }
+
+    public ContentBlockParam(ImageBlockParam value, JsonElement? element = null)
+    {
+        this.Value = value;
+        this._element = element;
+    }
+
+    public ContentBlockParam(DocumentBlockParam value, JsonElement? element = null)
+    {
+        this.Value = value;
+        this._element = element;
+    }
+
+    public ContentBlockParam(SearchResultBlockParam value, JsonElement? element = null)
+    {
+        this.Value = value;
+        this._element = element;
+    }
+
+    public ContentBlockParam(ThinkingBlockParam value, JsonElement? element = null)
+    {
+        this.Value = value;
+        this._element = element;
+    }
+
+    public ContentBlockParam(RedactedThinkingBlockParam value, JsonElement? element = null)
+    {
+        this.Value = value;
+        this._element = element;
+    }
+
+    public ContentBlockParam(ToolUseBlockParam value, JsonElement? element = null)
+    {
+        this.Value = value;
+        this._element = element;
+    }
+
+    public ContentBlockParam(ToolResultBlockParam value, JsonElement? element = null)
+    {
+        this.Value = value;
+        this._element = element;
+    }
+
+    public ContentBlockParam(ServerToolUseBlockParam value, JsonElement? element = null)
+    {
+        this.Value = value;
+        this._element = element;
+    }
+
+    public ContentBlockParam(WebSearchToolResultBlockParam value, JsonElement? element = null)
+    {
+        this.Value = value;
+        this._element = element;
+    }
+
+    public ContentBlockParam(WebFetchToolResultBlockParam value, JsonElement? element = null)
+    {
+        this.Value = value;
+        this._element = element;
+    }
+
+    public ContentBlockParam(CodeExecutionToolResultBlockParam value, JsonElement? element = null)
+    {
+        this.Value = value;
+        this._element = element;
+    }
+
+    public ContentBlockParam(
+        BashCodeExecutionToolResultBlockParam value,
+        JsonElement? element = null
+    )
+    {
+        this.Value = value;
+        this._element = element;
+    }
+
+    public ContentBlockParam(
+        TextEditorCodeExecutionToolResultBlockParam value,
+        JsonElement? element = null
+    )
+    {
+        this.Value = value;
+        this._element = element;
+    }
+
+    public ContentBlockParam(ToolSearchToolResultBlockParam value, JsonElement? element = null)
+    {
+        this.Value = value;
+        this._element = element;
+    }
+
+    public ContentBlockParam(ContainerUploadBlockParam value, JsonElement? element = null)
+    {
+        this.Value = value;
+        this._element = element;
+    }
+
+    public ContentBlockParam(MidConversationSystemBlockParam value, JsonElement? element = null)
+    {
+        this.Value = value;
+        this._element = element;
+    }
+
+    public ContentBlockParam(JsonElement element)
+    {
+        this._element = element;
+    }
+
+    /// <summary>
+    /// Returns true and sets the <c>out</c> parameter if the instance was constructed with a variant of
+    /// type <see cref="TextBlockParam"/>.
+    ///
+    /// <para>Consider using <see cref="Switch"/> or <see cref="Match"/> if you need to handle every variant.</para>
+    ///
+    /// <example>
+    /// <code>
+    /// if (instance.TryPickText(out var value)) {
+    ///     // `value` is of type `TextBlockParam`
+    ///     Console.WriteLine(value);
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    public bool TryPickText([NotNullWhen(true)] out TextBlockParam? value)
+    {
+        value = this.Value as TextBlockParam;
+        return value != null;
+    }
+
+    /// <summary>
+    /// Returns true and sets the <c>out</c> parameter if the instance was constructed with a variant of
+    /// type <see cref="ImageBlockParam"/>.
+    ///
+    /// <para>Consider using <see cref="Switch"/> or <see cref="Match"/> if you need to handle every variant.</para>
+    ///
+    /// <example>
+    /// <code>
+    /// if (instance.TryPickImage(out var value)) {
+    ///     // `value` is of type `ImageBlockParam`
+    ///     Console.WriteLine(value);
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    public bool TryPickImage([NotNullWhen(true)] out ImageBlockParam? value)
+    {
+        value = this.Value as ImageBlockParam;
+        return value != null;
+    }
+
+    /// <summary>
+    /// Returns true and sets the <c>out</c> parameter if the instance was constructed with a variant of
+    /// type <see cref="DocumentBlockParam"/>.
+    ///
+    /// <para>Consider using <see cref="Switch"/> or <see cref="Match"/> if you need to handle every variant.</para>
+    ///
+    /// <example>
+    /// <code>
+    /// if (instance.TryPickDocument(out var value)) {
+    ///     // `value` is of type `DocumentBlockParam`
+    ///     Console.WriteLine(value);
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    public bool TryPickDocument([NotNullWhen(true)] out DocumentBlockParam? value)
+    {
+        value = this.Value as DocumentBlockParam;
+        return value != null;
+    }
+
+    /// <summary>
+    /// Returns true and sets the <c>out</c> parameter if the instance was constructed with a variant of
+    /// type <see cref="SearchResultBlockParam"/>.
+    ///
+    /// <para>Consider using <see cref="Switch"/> or <see cref="Match"/> if you need to handle every variant.</para>
+    ///
+    /// <example>
+    /// <code>
+    /// if (instance.TryPickSearchResult(out var value)) {
+    ///     // `value` is of type `SearchResultBlockParam`
+    ///     Console.WriteLine(value);
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    public bool TryPickSearchResult([NotNullWhen(true)] out SearchResultBlockParam? value)
+    {
+        value = this.Value as SearchResultBlockParam;
+        return value != null;
+    }
+
+    /// <summary>
+    /// Returns true and sets the <c>out</c> parameter if the instance was constructed with a variant of
+    /// type <see cref="ThinkingBlockParam"/>.
+    ///
+    /// <para>Consider using <see cref="Switch"/> or <see cref="Match"/> if you need to handle every variant.</para>
+    ///
+    /// <example>
+    /// <code>
+    /// if (instance.TryPickThinking(out var value)) {
+    ///     // `value` is of type `ThinkingBlockParam`
+    ///     Console.WriteLine(value);
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    public bool TryPickThinking([NotNullWhen(true)] out ThinkingBlockParam? value)
+    {
+        value = this.Value as ThinkingBlockParam;
+        return value != null;
+    }
+
+    /// <summary>
+    /// Returns true and sets the <c>out</c> parameter if the instance was constructed with a variant of
+    /// type <see cref="RedactedThinkingBlockParam"/>.
+    ///
+    /// <para>Consider using <see cref="Switch"/> or <see cref="Match"/> if you need to handle every variant.</para>
+    ///
+    /// <example>
+    /// <code>
+    /// if (instance.TryPickRedactedThinking(out var value)) {
+    ///     // `value` is of type `RedactedThinkingBlockParam`
+    ///     Console.WriteLine(value);
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    public bool TryPickRedactedThinking([NotNullWhen(true)] out RedactedThinkingBlockParam? value)
+    {
+        value = this.Value as RedactedThinkingBlockParam;
+        return value != null;
+    }
+
+    /// <summary>
+    /// Returns true and sets the <c>out</c> parameter if the instance was constructed with a variant of
+    /// type <see cref="ToolUseBlockParam"/>.
+    ///
+    /// <para>Consider using <see cref="Switch"/> or <see cref="Match"/> if you need to handle every variant.</para>
+    ///
+    /// <example>
+    /// <code>
+    /// if (instance.TryPickToolUse(out var value)) {
+    ///     // `value` is of type `ToolUseBlockParam`
+    ///     Console.WriteLine(value);
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    public bool TryPickToolUse([NotNullWhen(true)] out ToolUseBlockParam? value)
+    {
+        value = this.Value as ToolUseBlockParam;
+        return value != null;
+    }
+
+    /// <summary>
+    /// Returns true and sets the <c>out</c> parameter if the instance was constructed with a variant of
+    /// type <see cref="ToolResultBlockParam"/>.
+    ///
+    /// <para>Consider using <see cref="Switch"/> or <see cref="Match"/> if you need to handle every variant.</para>
+    ///
+    /// <example>
+    /// <code>
+    /// if (instance.TryPickToolResult(out var value)) {
+    ///     // `value` is of type `ToolResultBlockParam`
+    ///     Console.WriteLine(value);
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    public bool TryPickToolResult([NotNullWhen(true)] out ToolResultBlockParam? value)
+    {
+        value = this.Value as ToolResultBlockParam;
+        return value != null;
+    }
+
+    /// <summary>
+    /// Returns true and sets the <c>out</c> parameter if the instance was constructed with a variant of
+    /// type <see cref="ServerToolUseBlockParam"/>.
+    ///
+    /// <para>Consider using <see cref="Switch"/> or <see cref="Match"/> if you need to handle every variant.</para>
+    ///
+    /// <example>
+    /// <code>
+    /// if (instance.TryPickServerToolUse(out var value)) {
+    ///     // `value` is of type `ServerToolUseBlockParam`
+    ///     Console.WriteLine(value);
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    public bool TryPickServerToolUse([NotNullWhen(true)] out ServerToolUseBlockParam? value)
+    {
+        value = this.Value as ServerToolUseBlockParam;
+        return value != null;
+    }
+
+    /// <summary>
+    /// Returns true and sets the <c>out</c> parameter if the instance was constructed with a variant of
+    /// type <see cref="WebSearchToolResultBlockParam"/>.
+    ///
+    /// <para>Consider using <see cref="Switch"/> or <see cref="Match"/> if you need to handle every variant.</para>
+    ///
+    /// <example>
+    /// <code>
+    /// if (instance.TryPickWebSearchToolResult(out var value)) {
+    ///     // `value` is of type `WebSearchToolResultBlockParam`
+    ///     Console.WriteLine(value);
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    public bool TryPickWebSearchToolResult(
+        [NotNullWhen(true)] out WebSearchToolResultBlockParam? value
+    )
+    {
+        value = this.Value as WebSearchToolResultBlockParam;
+        return value != null;
+    }
+
+    /// <summary>
+    /// Returns true and sets the <c>out</c> parameter if the instance was constructed with a variant of
+    /// type <see cref="WebFetchToolResultBlockParam"/>.
+    ///
+    /// <para>Consider using <see cref="Switch"/> or <see cref="Match"/> if you need to handle every variant.</para>
+    ///
+    /// <example>
+    /// <code>
+    /// if (instance.TryPickWebFetchToolResult(out var value)) {
+    ///     // `value` is of type `WebFetchToolResultBlockParam`
+    ///     Console.WriteLine(value);
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    public bool TryPickWebFetchToolResult(
+        [NotNullWhen(true)] out WebFetchToolResultBlockParam? value
+    )
+    {
+        value = this.Value as WebFetchToolResultBlockParam;
+        return value != null;
+    }
+
+    /// <summary>
+    /// Returns true and sets the <c>out</c> parameter if the instance was constructed with a variant of
+    /// type <see cref="CodeExecutionToolResultBlockParam"/>.
+    ///
+    /// <para>Consider using <see cref="Switch"/> or <see cref="Match"/> if you need to handle every variant.</para>
+    ///
+    /// <example>
+    /// <code>
+    /// if (instance.TryPickCodeExecutionToolResult(out var value)) {
+    ///     // `value` is of type `CodeExecutionToolResultBlockParam`
+    ///     Console.WriteLine(value);
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    public bool TryPickCodeExecutionToolResult(
+        [NotNullWhen(true)] out CodeExecutionToolResultBlockParam? value
+    )
+    {
+        value = this.Value as CodeExecutionToolResultBlockParam;
+        return value != null;
+    }
+
+    /// <summary>
+    /// Returns true and sets the <c>out</c> parameter if the instance was constructed with a variant of
+    /// type <see cref="BashCodeExecutionToolResultBlockParam"/>.
+    ///
+    /// <para>Consider using <see cref="Switch"/> or <see cref="Match"/> if you need to handle every variant.</para>
+    ///
+    /// <example>
+    /// <code>
+    /// if (instance.TryPickBashCodeExecutionToolResult(out var value)) {
+    ///     // `value` is of type `BashCodeExecutionToolResultBlockParam`
+    ///     Console.WriteLine(value);
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    public bool TryPickBashCodeExecutionToolResult(
+        [NotNullWhen(true)] out BashCodeExecutionToolResultBlockParam? value
+    )
+    {
+        value = this.Value as BashCodeExecutionToolResultBlockParam;
+        return value != null;
+    }
+
+    /// <summary>
+    /// Returns true and sets the <c>out</c> parameter if the instance was constructed with a variant of
+    /// type <see cref="TextEditorCodeExecutionToolResultBlockParam"/>.
+    ///
+    /// <para>Consider using <see cref="Switch"/> or <see cref="Match"/> if you need to handle every variant.</para>
+    ///
+    /// <example>
+    /// <code>
+    /// if (instance.TryPickTextEditorCodeExecutionToolResult(out var value)) {
+    ///     // `value` is of type `TextEditorCodeExecutionToolResultBlockParam`
+    ///     Console.WriteLine(value);
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    public bool TryPickTextEditorCodeExecutionToolResult(
+        [NotNullWhen(true)] out TextEditorCodeExecutionToolResultBlockParam? value
+    )
+    {
+        value = this.Value as TextEditorCodeExecutionToolResultBlockParam;
+        return value != null;
+    }
+
+    /// <summary>
+    /// Returns true and sets the <c>out</c> parameter if the instance was constructed with a variant of
+    /// type <see cref="ToolSearchToolResultBlockParam"/>.
+    ///
+    /// <para>Consider using <see cref="Switch"/> or <see cref="Match"/> if you need to handle every variant.</para>
+    ///
+    /// <example>
+    /// <code>
+    /// if (instance.TryPickToolSearchToolResult(out var value)) {
+    ///     // `value` is of type `ToolSearchToolResultBlockParam`
+    ///     Console.WriteLine(value);
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    public bool TryPickToolSearchToolResult(
+        [NotNullWhen(true)] out ToolSearchToolResultBlockParam? value
+    )
+    {
+        value = this.Value as ToolSearchToolResultBlockParam;
+        return value != null;
+    }
+
+    /// <summary>
+    /// Returns true and sets the <c>out</c> parameter if the instance was constructed with a variant of
+    /// type <see cref="ContainerUploadBlockParam"/>.
+    ///
+    /// <para>Consider using <see cref="Switch"/> or <see cref="Match"/> if you need to handle every variant.</para>
+    ///
+    /// <example>
+    /// <code>
+    /// if (instance.TryPickContainerUpload(out var value)) {
+    ///     // `value` is of type `ContainerUploadBlockParam`
+    ///     Console.WriteLine(value);
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    public bool TryPickContainerUpload([NotNullWhen(true)] out ContainerUploadBlockParam? value)
+    {
+        value = this.Value as ContainerUploadBlockParam;
+        return value != null;
+    }
+
+    /// <summary>
+    /// Returns true and sets the <c>out</c> parameter if the instance was constructed with a variant of
+    /// type <see cref="MidConversationSystemBlockParam"/>.
+    ///
+    /// <para>Consider using <see cref="Switch"/> or <see cref="Match"/> if you need to handle every variant.</para>
+    ///
+    /// <example>
+    /// <code>
+    /// if (instance.TryPickMidConversationSystem(out var value)) {
+    ///     // `value` is of type `MidConversationSystemBlockParam`
+    ///     Console.WriteLine(value);
+    /// }
+    /// </code>
+    /// </example>
+    /// </summary>
+    public bool TryPickMidConversationSystem(
+        [NotNullWhen(true)] out MidConversationSystemBlockParam? value
+    )
+    {
+        value = this.Value as MidConversationSystemBlockParam;
+        return value != null;
+    }
+
+    /// <summary>
+    /// Calls the function parameter corresponding to the variant the instance was constructed with.
+    ///
+    /// <para>Use the <c>TryPick</c> method(s) if you don't need to handle every variant, or <see cref="Match"/>
+    /// if you need your function parameters to return something.</para>
+    ///
+    /// <exception cref="AnthropicInvalidDataException">
+    /// Thrown when the instance was constructed with an unknown variant (e.g. deserialized from raw data
+    /// that doesn't match any variant's expected shape).
+    /// </exception>
+    ///
+    /// <example>
+    /// <code>
+    /// instance.Switch(
+    ///     (TextBlockParam value) =&gt; {...},
+    ///     (ImageBlockParam value) =&gt; {...},
+    ///     (DocumentBlockParam value) =&gt; {...},
+    ///     (SearchResultBlockParam value) =&gt; {...},
+    ///     (ThinkingBlockParam value) =&gt; {...},
+    ///     (RedactedThinkingBlockParam value) =&gt; {...},
+    ///     (ToolUseBlockParam value) =&gt; {...},
+    ///     (ToolResultBlockParam value) =&gt; {...},
+    ///     (ServerToolUseBlockParam value) =&gt; {...},
+    ///     (WebSearchToolResultBlockParam value) =&gt; {...},
+    ///     (WebFetchToolResultBlockParam value) =&gt; {...},
+    ///     (CodeExecutionToolResultBlockParam value) =&gt; {...},
+    ///     (BashCodeExecutionToolResultBlockParam value) =&gt; {...},
+    ///     (TextEditorCodeExecutionToolResultBlockParam value) =&gt; {...},
+    ///     (ToolSearchToolResultBlockParam value) =&gt; {...},
+    ///     (ContainerUploadBlockParam value) =&gt; {...},
+    ///     (MidConversationSystemBlockParam value) =&gt; {...}
+    /// );
+    /// </code>
+    /// </example>
+    /// </summary>
+    public void Switch(
+        System::Action<TextBlockParam> text,
+        System::Action<ImageBlockParam> image,
+        System::Action<DocumentBlockParam> document,
+        System::Action<SearchResultBlockParam> searchResult,
+        System::Action<ThinkingBlockParam> thinking,
+        System::Action<RedactedThinkingBlockParam> redactedThinking,
+        System::Action<ToolUseBlockParam> toolUse,
+        System::Action<ToolResultBlockParam> toolResult,
+        System::Action<ServerToolUseBlockParam> serverToolUse,
+        System::Action<WebSearchToolResultBlockParam> webSearchToolResult,
+        System::Action<WebFetchToolResultBlockParam> webFetchToolResult,
+        System::Action<CodeExecutionToolResultBlockParam> codeExecutionToolResult,
+        System::Action<BashCodeExecutionToolResultBlockParam> bashCodeExecutionToolResult,
+        System::Action<TextEditorCodeExecutionToolResultBlockParam> textEditorCodeExecutionToolResult,
+        System::Action<ToolSearchToolResultBlockParam> toolSearchToolResult,
+        System::Action<ContainerUploadBlockParam> containerUpload,
+        System::Action<MidConversationSystemBlockParam> midConversationSystem
+    )
+    {
+        switch (this.Value)
+        {
+            case TextBlockParam value:
+                text(value);
+                break;
+            case ImageBlockParam value:
+                image(value);
+                break;
+            case DocumentBlockParam value:
+                document(value);
+                break;
+            case SearchResultBlockParam value:
+                searchResult(value);
+                break;
+            case ThinkingBlockParam value:
+                thinking(value);
+                break;
+            case RedactedThinkingBlockParam value:
+                redactedThinking(value);
+                break;
+            case ToolUseBlockParam value:
+                toolUse(value);
+                break;
+            case ToolResultBlockParam value:
+                toolResult(value);
+                break;
+            case ServerToolUseBlockParam value:
+                serverToolUse(value);
+                break;
+            case WebSearchToolResultBlockParam value:
+                webSearchToolResult(value);
+                break;
+            case WebFetchToolResultBlockParam value:
+                webFetchToolResult(value);
+                break;
+            case CodeExecutionToolResultBlockParam value:
+                codeExecutionToolResult(value);
+                break;
+            case BashCodeExecutionToolResultBlockParam value:
+                bashCodeExecutionToolResult(value);
+                break;
+            case TextEditorCodeExecutionToolResultBlockParam value:
+                textEditorCodeExecutionToolResult(value);
+                break;
+            case ToolSearchToolResultBlockParam value:
+                toolSearchToolResult(value);
+                break;
+            case ContainerUploadBlockParam value:
+                containerUpload(value);
+                break;
+            case MidConversationSystemBlockParam value:
+                midConversationSystem(value);
+                break;
+            default:
+                throw new AnthropicInvalidDataException(
+                    "Data did not match any variant of ContentBlockParam"
+                );
+        }
+    }
+
+    /// <summary>
+    /// Calls the function parameter corresponding to the variant the instance was constructed with and
+    /// returns its result.
+    ///
+    /// <para>Use the <c>TryPick</c> method(s) if you don't need to handle every variant, or <see cref="Switch"/>
+    /// if you don't need your function parameters to return a value.</para>
+    ///
+    /// <exception cref="AnthropicInvalidDataException">
+    /// Thrown when the instance was constructed with an unknown variant (e.g. deserialized from raw data
+    /// that doesn't match any variant's expected shape).
+    /// </exception>
+    ///
+    /// <example>
+    /// <code>
+    /// var result = instance.Match(
+    ///     (TextBlockParam value) =&gt; {...},
+    ///     (ImageBlockParam value) =&gt; {...},
+    ///     (DocumentBlockParam value) =&gt; {...},
+    ///     (SearchResultBlockParam value) =&gt; {...},
+    ///     (ThinkingBlockParam value) =&gt; {...},
+    ///     (RedactedThinkingBlockParam value) =&gt; {...},
+    ///     (ToolUseBlockParam value) =&gt; {...},
+    ///     (ToolResultBlockParam value) =&gt; {...},
+    ///     (ServerToolUseBlockParam value) =&gt; {...},
+    ///     (WebSearchToolResultBlockParam value) =&gt; {...},
+    ///     (WebFetchToolResultBlockParam value) =&gt; {...},
+    ///     (CodeExecutionToolResultBlockParam value) =&gt; {...},
+    ///     (BashCodeExecutionToolResultBlockParam value) =&gt; {...},
+    ///     (TextEditorCodeExecutionToolResultBlockParam value) =&gt; {...},
+    ///     (ToolSearchToolResultBlockParam value) =&gt; {...},
+    ///     (ContainerUploadBlockParam value) =&gt; {...},
+    ///     (MidConversationSystemBlockParam value) =&gt; {...}
+    /// );
+    /// </code>
+    /// </example>
+    /// </summary>
+    public T Match<T>(
+        System::Func<TextBlockParam, T> text,
+        System::Func<ImageBlockParam, T> image,
+        System::Func<DocumentBlockParam, T> document,
+        System::Func<SearchResultBlockParam, T> searchResult,
+        System::Func<ThinkingBlockParam, T> thinking,
+        System::Func<RedactedThinkingBlockParam, T> redactedThinking,
+        System::Func<ToolUseBlockParam, T> toolUse,
+        System::Func<ToolResultBlockParam, T> toolResult,
+        System::Func<ServerToolUseBlockParam, T> serverToolUse,
+        System::Func<WebSearchToolResultBlockParam, T> webSearchToolResult,
+        System::Func<WebFetchToolResultBlockParam, T> webFetchToolResult,
+        System::Func<CodeExecutionToolResultBlockParam, T> codeExecutionToolResult,
+        System::Func<BashCodeExecutionToolResultBlockParam, T> bashCodeExecutionToolResult,
+        System::Func<
+            TextEditorCodeExecutionToolResultBlockParam,
+            T
+        > textEditorCodeExecutionToolResult,
+        System::Func<ToolSearchToolResultBlockParam, T> toolSearchToolResult,
+        System::Func<ContainerUploadBlockParam, T> containerUpload,
+        System::Func<MidConversationSystemBlockParam, T> midConversationSystem
+    )
+    {
+        return this.Value switch
+        {
+            TextBlockParam value => text(value),
+            ImageBlockParam value => image(value),
+            DocumentBlockParam value => document(value),
+            SearchResultBlockParam value => searchResult(value),
+            ThinkingBlockParam value => thinking(value),
+            RedactedThinkingBlockParam value => redactedThinking(value),
+            ToolUseBlockParam value => toolUse(value),
+            ToolResultBlockParam value => toolResult(value),
+            ServerToolUseBlockParam value => serverToolUse(value),
+            WebSearchToolResultBlockParam value => webSearchToolResult(value),
+            WebFetchToolResultBlockParam value => webFetchToolResult(value),
+            CodeExecutionToolResultBlockParam value => codeExecutionToolResult(value),
+            BashCodeExecutionToolResultBlockParam value => bashCodeExecutionToolResult(value),
+            TextEditorCodeExecutionToolResultBlockParam value => textEditorCodeExecutionToolResult(
+                value
+            ),
+            ToolSearchToolResultBlockParam value => toolSearchToolResult(value),
+            ContainerUploadBlockParam value => containerUpload(value),
+            MidConversationSystemBlockParam value => midConversationSystem(value),
+            _ => throw new AnthropicInvalidDataException(
+                "Data did not match any variant of ContentBlockParam"
+            ),
+        };
+    }
+
+    public static implicit operator ContentBlockParam(TextBlockParam value) => new(value);
+
+    public static implicit operator ContentBlockParam(ImageBlockParam value) => new(value);
+
+    public static implicit operator ContentBlockParam(DocumentBlockParam value) => new(value);
+
+    public static implicit operator ContentBlockParam(SearchResultBlockParam value) => new(value);
+
+    public static implicit operator ContentBlockParam(ThinkingBlockParam value) => new(value);
+
+    public static implicit operator ContentBlockParam(RedactedThinkingBlockParam value) =>
+        new(value);
+
+    public static implicit operator ContentBlockParam(ToolUseBlockParam value) => new(value);
+
+    public static implicit operator ContentBlockParam(ToolResultBlockParam value) => new(value);
+
+    public static implicit operator ContentBlockParam(ServerToolUseBlockParam value) => new(value);
+
+    public static implicit operator ContentBlockParam(WebSearchToolResultBlockParam value) =>
+        new(value);
+
+    public static implicit operator ContentBlockParam(WebFetchToolResultBlockParam value) =>
+        new(value);
+
+    public static implicit operator ContentBlockParam(CodeExecutionToolResultBlockParam value) =>
+        new(value);
+
+    public static implicit operator ContentBlockParam(
+        BashCodeExecutionToolResultBlockParam value
+    ) => new(value);
+
+    public static implicit operator ContentBlockParam(
+        TextEditorCodeExecutionToolResultBlockParam value
+    ) => new(value);
+
+    public static implicit operator ContentBlockParam(ToolSearchToolResultBlockParam value) =>
+        new(value);
+
+    public static implicit operator ContentBlockParam(ContainerUploadBlockParam value) =>
+        new(value);
+
+    public static implicit operator ContentBlockParam(MidConversationSystemBlockParam value) =>
+        new(value);
+
+    /// <summary>
+    /// Validates that the instance was constructed with a known variant and that this variant is valid
+    /// (based on its own <c>Validate</c> method).
+    ///
+    /// <para>This is useful for instances constructed from raw JSON data (e.g. deserialized from an API response).</para>
+    ///
+    /// <exception cref="AnthropicInvalidDataException">
+    /// Thrown when the instance does not pass validation.
+    /// </exception>
+    /// </summary>
+    public override void Validate()
+    {
+        if (this.Value == null)
+        {
+            throw new AnthropicInvalidDataException(
+                "Data did not match any variant of ContentBlockParam"
+            );
+        }
+        this.Switch(
+            (text) => text.Validate(),
+            (image) => image.Validate(),
+            (document) => document.Validate(),
+            (searchResult) => searchResult.Validate(),
+            (thinking) => thinking.Validate(),
+            (redactedThinking) => redactedThinking.Validate(),
+            (toolUse) => toolUse.Validate(),
+            (toolResult) => toolResult.Validate(),
+            (serverToolUse) => serverToolUse.Validate(),
+            (webSearchToolResult) => webSearchToolResult.Validate(),
+            (webFetchToolResult) => webFetchToolResult.Validate(),
+            (codeExecutionToolResult) => codeExecutionToolResult.Validate(),
+            (bashCodeExecutionToolResult) => bashCodeExecutionToolResult.Validate(),
+            (textEditorCodeExecutionToolResult) => textEditorCodeExecutionToolResult.Validate(),
+            (toolSearchToolResult) => toolSearchToolResult.Validate(),
+            (containerUpload) => containerUpload.Validate(),
+            (midConversationSystem) => midConversationSystem.Validate()
+        );
+    }
+
+    public virtual bool Equals(ContentBlockParam? other) =>
+        other != null
+        && this.VariantIndex() == other.VariantIndex()
+        && JsonElement.DeepEquals(this.Json, other.Json);
+
+    public override int GetHashCode()
+    {
+        return 0;
+    }
+
+    public override string ToString() =>
+        JsonSerializer.Serialize(
+            FriendlyJsonPrinter.PrintValue(this.Json),
+            ModelBase.ToStringSerializerOptions
+        );
+
+    int VariantIndex()
+    {
+        return this.Value switch
+        {
+            TextBlockParam _ => 0,
+            ImageBlockParam _ => 1,
+            DocumentBlockParam _ => 2,
+            SearchResultBlockParam _ => 3,
+            ThinkingBlockParam _ => 4,
+            RedactedThinkingBlockParam _ => 5,
+            ToolUseBlockParam _ => 6,
+            ToolResultBlockParam _ => 7,
+            ServerToolUseBlockParam _ => 8,
+            WebSearchToolResultBlockParam _ => 9,
+            WebFetchToolResultBlockParam _ => 10,
+            CodeExecutionToolResultBlockParam _ => 11,
+            BashCodeExecutionToolResultBlockParam _ => 12,
+            TextEditorCodeExecutionToolResultBlockParam _ => 13,
+            ToolSearchToolResultBlockParam _ => 14,
+            ContainerUploadBlockParam _ => 15,
+            MidConversationSystemBlockParam _ => 16,
+            _ => -1,
+        };
+    }
+}
+
+sealed class ContentBlockParamConverter : JsonConverter<ContentBlockParam>
+{
+    public override ContentBlockParam? Read(
+        ref Utf8JsonReader reader,
+        System::Type typeToConvert,
+        JsonSerializerOptions options
+    )
+    {
+        var element = JsonSerializer.Deserialize<JsonElement>(ref reader, options);
+        string? type;
+        try
+        {
+            type = element.GetProperty("type").GetString();
+        }
+        catch
+        {
+            type = null;
+        }
+
+        switch (type)
+        {
+            case "text":
+            {
+                try
+                {
+                    var deserialized = JsonSerializer.Deserialize<TextBlockParam>(element, options);
+                    if (deserialized != null)
+                    {
+                        return new(deserialized, element);
+                    }
+                }
+                catch (JsonException)
+                {
+                    // ignore
+                }
+
+                return new(element);
+            }
+            case "image":
+            {
+                try
+                {
+                    var deserialized = JsonSerializer.Deserialize<ImageBlockParam>(
+                        element,
+                        options
+                    );
+                    if (deserialized != null)
+                    {
+                        return new(deserialized, element);
+                    }
+                }
+                catch (JsonException)
+                {
+                    // ignore
+                }
+
+                return new(element);
+            }
+            case "document":
+            {
+                try
+                {
+                    var deserialized = JsonSerializer.Deserialize<DocumentBlockParam>(
+                        element,
+                        options
+                    );
+                    if (deserialized != null)
+                    {
+                        return new(deserialized, element);
+                    }
+                }
+                catch (JsonException)
+                {
+                    // ignore
+                }
+
+                return new(element);
+            }
+            case "search_result":
+            {
+                try
+                {
+                    var deserialized = JsonSerializer.Deserialize<SearchResultBlockParam>(
+                        element,
+                        options
+                    );
+                    if (deserialized != null)
+                    {
+                        return new(deserialized, element);
+                    }
+                }
+                catch (JsonException)
+                {
+                    // ignore
+                }
+
+                return new(element);
+            }
+            case "thinking":
+            {
+                try
+                {
+                    var deserialized = JsonSerializer.Deserialize<ThinkingBlockParam>(
+                        element,
+                        options
+                    );
+                    if (deserialized != null)
+                    {
+                        return new(deserialized, element);
+                    }
+                }
+                catch (JsonException)
+                {
+                    // ignore
+                }
+
+                return new(element);
+            }
+            case "redacted_thinking":
+            {
+                try
+                {
+                    var deserialized = JsonSerializer.Deserialize<RedactedThinkingBlockParam>(
+                        element,
+                        options
+                    );
+                    if (deserialized != null)
+                    {
+                        return new(deserialized, element);
+                    }
+                }
+                catch (JsonException)
+                {
+                    // ignore
+                }
+
+                return new(element);
+            }
+            case "tool_use":
+            {
+                try
+                {
+                    var deserialized = JsonSerializer.Deserialize<ToolUseBlockParam>(
+                        element,
+                        options
+                    );
+                    if (deserialized != null)
+                    {
+                        return new(deserialized, element);
+                    }
+                }
+                catch (JsonException)
+                {
+                    // ignore
+                }
+
+                return new(element);
+            }
+            case "tool_result":
+            {
+                try
+                {
+                    var deserialized = JsonSerializer.Deserialize<ToolResultBlockParam>(
+                        element,
+                        options
+                    );
+                    if (deserialized != null)
+                    {
+                        return new(deserialized, element);
+                    }
+                }
+                catch (JsonException)
+                {
+                    // ignore
+                }
+
+                return new(element);
+            }
+            case "server_tool_use":
+            {
+                try
+                {
+                    var deserialized = JsonSerializer.Deserialize<ServerToolUseBlockParam>(
+                        element,
+                        options
+                    );
+                    if (deserialized != null)
+                    {
+                        return new(deserialized, element);
+                    }
+                }
+                catch (JsonException)
+                {
+                    // ignore
+                }
+
+                return new(element);
+            }
+            case "web_search_tool_result":
+            {
+                try
+                {
+                    var deserialized = JsonSerializer.Deserialize<WebSearchToolResultBlockParam>(
+                        element,
+                        options
+                    );
+                    if (deserialized != null)
+                    {
+                        return new(deserialized, element);
+                    }
+                }
+                catch (JsonException)
+                {
+                    // ignore
+                }
+
+                return new(element);
+            }
+            case "web_fetch_tool_result":
+            {
+                try
+                {
+                    var deserialized = JsonSerializer.Deserialize<WebFetchToolResultBlockParam>(
+                        element,
+                        options
+                    );
+                    if (deserialized != null)
+                    {
+                        return new(deserialized, element);
+                    }
+                }
+                catch (JsonException)
+                {
+                    // ignore
+                }
+
+                return new(element);
+            }
+            case "code_execution_tool_result":
+            {
+                try
+                {
+                    var deserialized =
+                        JsonSerializer.Deserialize<CodeExecutionToolResultBlockParam>(
+                            element,
+                            options
+                        );
+                    if (deserialized != null)
+                    {
+                        return new(deserialized, element);
+                    }
+                }
+                catch (JsonException)
+                {
+                    // ignore
+                }
+
+                return new(element);
+            }
+            case "bash_code_execution_tool_result":
+            {
+                try
+                {
+                    var deserialized =
+                        JsonSerializer.Deserialize<BashCodeExecutionToolResultBlockParam>(
+                            element,
+                            options
+                        );
+                    if (deserialized != null)
+                    {
+                        return new(deserialized, element);
+                    }
+                }
+                catch (JsonException)
+                {
+                    // ignore
+                }
+
+                return new(element);
+            }
+            case "text_editor_code_execution_tool_result":
+            {
+                try
+                {
+                    var deserialized =
+                        JsonSerializer.Deserialize<TextEditorCodeExecutionToolResultBlockParam>(
+                            element,
+                            options
+                        );
+                    if (deserialized != null)
+                    {
+                        return new(deserialized, element);
+                    }
+                }
+                catch (JsonException)
+                {
+                    // ignore
+                }
+
+                return new(element);
+            }
+            case "tool_search_tool_result":
+            {
+                try
+                {
+                    var deserialized = JsonSerializer.Deserialize<ToolSearchToolResultBlockParam>(
+                        element,
+                        options
+                    );
+                    if (deserialized != null)
+                    {
+                        return new(deserialized, element);
+                    }
+                }
+                catch (JsonException)
+                {
+                    // ignore
+                }
+
+                return new(element);
+            }
+            case "container_upload":
+            {
+                try
+                {
+                    var deserialized = JsonSerializer.Deserialize<ContainerUploadBlockParam>(
+                        element,
+                        options
+                    );
+                    if (deserialized != null)
+                    {
+                        return new(deserialized, element);
+                    }
+                }
+                catch (JsonException)
+                {
+                    // ignore
+                }
+
+                return new(element);
+            }
+            case "mid_conv_system":
+            {
+                try
+                {
+                    var deserialized = JsonSerializer.Deserialize<MidConversationSystemBlockParam>(
+                        element,
+                        options
+                    );
+                    if (deserialized != null)
+                    {
+                        return new(deserialized, element);
+                    }
+                }
+                catch (JsonException)
+                {
+                    // ignore
+                }
+
+                return new(element);
+            }
+            default:
+            {
+                return new ContentBlockParam(element);
+            }
+        }
+    }
+
+    public override void Write(
+        Utf8JsonWriter writer,
+        ContentBlockParam value,
+        JsonSerializerOptions options
+    )
+    {
+        JsonSerializer.Serialize(writer, value.Json, options);
+    }
+}
