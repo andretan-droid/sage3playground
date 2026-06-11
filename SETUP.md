@@ -1,14 +1,14 @@
 # Setup Guide
 
-## 1. Move this code into your private `trading-agent` repo
+## 1. Move this code into your private `claude-trading-agent` repo
 
-Create a **private** repository named `trading-agent` on GitHub (no README —
-keep it empty), then from a machine with this code checked out:
+From any machine with git (make sure the repo on GitHub is **private** and
+empty — no README):
 
 ```bash
-git clone -b claude/sweet-hopper-yhhczn https://github.com/andretan-droid/sage3playground.git trading-agent
-cd trading-agent
-git remote set-url origin https://github.com/andretan-droid/trading-agent.git
+git clone -b claude/sweet-hopper-yhhczn https://github.com/andretan-droid/sage3playground.git claude-trading-agent
+cd claude-trading-agent
+git remote set-url origin https://github.com/andretan-droid/claude-trading-agent.git
 git branch -m main
 git push -u origin main
 ```
