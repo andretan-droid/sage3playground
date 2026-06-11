@@ -1,0 +1,113 @@
+name: Trading Agent
+
+on:
+  workflow_dispatch:
+    inputs:
+      routine:
+        description: Routine to run
+        required: true
+        type: choice
+        options: [premarket, market-open, midday, daily-summary, weekly-review]
+  schedule:
+    # Each ET time has two UTC crons (EDT/EST); routine_guard.sh skips the
+    # wrong-DST duplicate. Weekdays only.
+    - cron: '30 12 * * 1-5'   # premarket      08:30 ET (EDT)
+    - cron: '30 13 * * 1-5'   # premarket      08:30 ET (EST)
+    - cron: '45 13 * * 1-5'   # market-open    09:45 ET (EDT)
+    - cron: '45 14 * * 1-5'   # market-open    09:45 ET (EST)
+    - cron: '0 16 * * 1-5'    # midday         12:00 ET (EDT)
+    - cron: '0 17 * * 1-5'    # midday         12:00 ET (EST)
+    - cron: '15 20 * * 1-5'   # daily-summary  16:15 ET (EDT)
+    - cron: '15 21 * * 1-5'   # daily-summary  16:15 ET (EST)
+    - cron: '45 20 * * 5'     # weekly-review  Fri 16:45 ET (EDT)
+    - cron: '45 21 * * 5'     # weekly-review  Fri 16:45 ET (EST)
+
+# Never let two routines run concurrently; a queued run still executes after.
+concurrency:
+  group: trading
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  routine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      APCA_API_KEY_ID: ${{ secrets.APCA_API_KEY_ID }}
+      APCA_API_SECRET_KEY: ${{ secrets.APCA_API_SECRET_KEY }}
+      APCA_BASE_URL: ${{ vars.APCA_BASE_URL != '' && vars.APCA_BASE_URL || 'https://paper-api.alpaca.markets' }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+    steps:
+      - name: Map trigger to routine
+        id: map
+        run: |
+          case "${{ github.event_name }}" in
+            workflow_dispatch)
+              echo "routine=${{ inputs.routine }}" >> "$GITHUB_OUTPUT"
+              echo "variant=manual" >> "$GITHUB_OUTPUT"
+              ;;
+            schedule)
+              case "${{ github.event.schedule }}" in
+                '30 12 * * 1-5') R=premarket;     V=edt ;;
+                '30 13 * * 1-5') R=premarket;     V=est ;;
+                '45 13 * * 1-5') R=market-open;   V=edt ;;
+                '45 14 * * 1-5') R=market-open;   V=est ;;
+                '0 16 * * 1-5')  R=midday;        V=edt ;;
+                '0 17 * * 1-5')  R=midday;        V=est ;;
+                '15 20 * * 1-5') R=daily-summary; V=edt ;;
+                '15 21 * * 1-5') R=daily-summary; V=est ;;
+                '45 20 * * 5')   R=weekly-review; V=edt ;;
+                '45 21 * * 5')   R=weekly-review; V=est ;;
+                *) echo "Unknown schedule"; exit 1 ;;
+              esac
+              echo "routine=$R" >> "$GITHUB_OUTPUT"
+              echo "variant=$V" >> "$GITHUB_OUTPUT"
+              ;;
+          esac
+
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Guard (DST + market calendar)
+        id: guard
+        run: bash scripts/routine_guard.sh "${{ steps.map.outputs.routine }}" "${{ steps.map.outputs.variant }}"
+
+      - name: Install Claude Code
+        if: steps.guard.outputs.proceed == 'true'
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Run routine
+        if: steps.guard.outputs.proceed == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_MODEL: ${{ vars.CLAUDE_MODEL }}
+        run: |
+          git config user.name "trading-agent"
+          git config user.email "trading-agent@users.noreply.github.com"
+          claude -p "$(cat "routines/${{ steps.map.outputs.routine }}.md")" \
+            ${CLAUDE_MODEL:+--model "$CLAUDE_MODEL"} \
+            --max-turns 100 \
+            --output-format text
+
+      - name: Commit any leftover state
+        if: always() && steps.guard.outputs.proceed == 'true'
+        run: |
+          git config user.name "trading-agent"
+          git config user.email "trading-agent@users.noreply.github.com"
+          git add memory/ notifications.log 2>/dev/null || git add memory/
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(${{ steps.map.outputs.routine }}): auto-commit leftover state"
+          fi
+          for i in 1 2 3 4; do
+            if git push origin main; then break; fi
+            sleep $((2 ** i))
+            git pull --rebase origin main || true
+          done
+
+      - name: Failure alert
+        if: failure()
+        run: |
+          bash scripts/discord.sh "⚠️ Trading agent **${{ steps.map.outputs.routine }}** run FAILED. Logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true

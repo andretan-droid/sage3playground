@@ -1,0 +1,4 @@
+.env
+notifications.log
+__pycache__/
+*.pyc
